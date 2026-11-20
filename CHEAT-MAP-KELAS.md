@@ -1,78 +1,80 @@
-# Cheat map kelas bug per lane — buat mutator
+# Bug-class cheat map per lane - for the mutator
 
-Dipakai buat nentuin Angle prioritas sebelum `mutate`. Lane = `Project type`
-di threat model: `web2`, `web3-contract`, atau `wallet`.
+Use it to pick a priority angle before `mutate`. Lane = `Project type`
+in the threat model: `web2`, `web3-contract`, or `wallet`.
 
-## Cara pakai (4 langkah)
+## How to use (4 steps)
 
-1. Tentuin lane dari project type.
-2. Pilih **max 3 kelas** dari lane itu, urut impact tertinggi di project ini
-   (reward, scope yang dibuka, bukti yang sudah ada). Jangan copy top 3
-   lane lain.
-3. Tulis nama kelasnya persis seperti di bawah ini ke threat model,
-   section `## Angle prioritas`, format `### Kelas N — <nama kelas>`.
-   Mutator baca nama itu dan auto-pilih lensa yang dipetakan ke kelas itu
-   (lihat `priority-classes.json`).
-4. Jalanin `mutate`. Kalau mau paksa kelas tanpa edit threat model:
-   `mutate --classes <id-kelas-1>,<id-kelas-2>` (id ada di tiap kelas).
+1. Pick the lane from the project type.
+2. Pick **max 3 classes** from that lane, highest impact first for this
+   project (reward, scope opened up, existing evidence). Do not copy
+   another lane's top 3.
+3. Write the class names exactly as below into the threat model,
+   `## Priority angle` section, format `### Class N - <class name>`.
+   The mutator reads the name and auto-selects the lenses mapped to
+   that class (see `priority-classes.json`).
+4. Run `mutate`. To force classes without editing the threat model:
+   `mutate --classes <class-id-1>,<class-id-2>` (ids are listed with
+   each class).
 
-Aturan: 1-2 kelas = ideal buat depth, 3 kelas = ceiling. Kelas ke-4+
-dicopot dari run ini, masuk round berikutnya kalau signals top 3 kering.
+Rule: 1-2 classes is ideal for depth, 3 classes is the ceiling.
+Class 4 and beyond are dropped from this run and go into the next
+round if signals from the top 3 run dry.
 
-## Rumus gampang (2 kelas)
+## The easy formula (2 classes)
 
-Tiap tema bug punya 2 sampai 5 cara nyari. Kalau lu pilih 2 tema,
-cara nyarinya digabung jadi satu. Cara yang sama di dua tema cuma
-dihitung sekali, jangan dihitung dua kali.
+Each bug theme has 2 to 5 ways to hunt. Pick 2 themes and the hunting
+methods merge into one set. A method shared by both themes counts
+once, not twice.
 
-1. Gabung cara nyari dari 2 tema, buang yang kembar. Hasilnya
-   biasanya 5 sampai 10 cara nyari.
-2. Kali 3. Tiap cara nyari dibikin 3 versi pertanyaan.
+1. Merge the hunting methods from both themes, drop the duplicates.
+   Usually 5 to 10 methods.
+2. Multiply by 3. Each method becomes 3 question versions.
 
-Jadi 2 tema biasanya jadi 15 sampai 30 pertanyaan. Contoh: tema A
-punya 5 cara, tema B punya 5 cara, 1 cara sama di keduanya. Total
-cara nyari = 5 + 5 - 1 = 9. Pertanyaan = 9 kali 3 = 27.
+So 2 themes usually become 15 to 30 questions. Example: theme A has
+5 methods, theme B has 5 methods, 1 method is shared. Total methods
+= 5 + 5 - 1 = 9. Questions = 9 times 3 = 27.
 
-Catatan beda: kelas di sini itu **pengelompokan berdasarkan impact**,
-bukan teknik. Teknik (SSRF, XSS, SQLi, RCE, race, dsb) itu cara
-pelanggarannya, dan satu teknik bisa masuk ke beberapa kelas. Lensa
-(L01-L13) itu sudut pandang nyarinya. Invariant itu properti yang
-harus selalu benar dan dilanggar kalau ada bug.
+Note the difference: classes here group by **impact**, not by
+technique. A technique (SSRF, XSS, SQLi, RCE, race, and so on) is how
+the violation happens, and one technique can sit in several classes.
+Lenses (L01-L13) are the hunting angles. An invariant is a property
+that must always hold, and a bug breaks it.
 
 ---
 
-## Teknik -> Lensa
+## Technique -> Lens
 
-Teknik itu cara pelanggarannya. Kelas di atas itu apa yang dilanggar.
-Satu teknik bisa masuk ke beberapa kelas.
+A technique is how the violation happens. A class is what gets
+violated. One technique can sit in several classes.
 
-| Teknik | Lensa | Kenapa lensa itu |
+| Technique | Lens | Why that lens |
 |---|---|---|
-| IDOR / BOLA (Tenant isolation) | L01, L02, L03, L06, L07, L11 | Tidak ada cek kepemilikan, cek cuma di satu jalur, ID dipercaya begitu saja, objek sama izin beda, owner bisa dipindah, akses lama masih hidup. |
-| SSRF | L01, L03, L05, L06, L07, L09 | Fetch URL tanpa allowlist, URL dipercaya tanpa cek, digabung dengan fitur lain jadi jalan ke internal, jalur lain lebih longgar, identitas internal dipakai, urutan cek bisa dilewati. |
-| ATO / Auth bypass | L01, L02, L03, L07, L11 | Tidak ada cek, cek cuma di satu endpoint, token dipercaya tanpa cek, akun bisa di-link ke attacker, sesi lama masih hidup. |
-| XSS | L01, L03, L05, L06, L09 | Input tidak dicek, data dipercaya tanpa encode, digabung dengan fitur lain, tampil beda di tiap tempat, urutan render bisa dilewati. |
-| SQLi | L01, L03, L04, L09 | Input tidak dicek, query dipercaya begitu saja, perilaku database yang tidak tertulis, urutan validasi bisa dilewati. |
-| RCE | L01, L03, L04, L05, L06 | Tidak ada cek di sink eksekusi, input dipercaya, perilaku parser tidak tertulis, digabung dengan upload atau template, jalur lain lebih longgar. |
-| Business Logic | L03, L05, L09, L10, L13 | Angka dipercaya, gabungan langkah jadi bypass, urutan langkah dilewati, efek samping tetap jalan, dua state bertentangan. |
-| Race Condition | L05, L09, L10, L13 | Dua request bersamaan, urutan cek dan pakai bisa dibalik, efek samping tidak ikut batal, state ganda bertentangan. |
-| File Upload / Traversal | L01, L06, L08, L12 | Tipe file tidak dicek, jalur download beda izinnya, file gagal tetap tersimpan, file bisa dibatalkan atau diganti pihak lain. |
-| Host Header / Reset Poisoning | L02, L03, L07 | Host dicek di satu tempat saja, host dari request dipercaya, link reset bisa dipindah ke akun attacker. |
-| Prototype Pollution | L03, L04, L05 | Objek merge dipercaya tanpa cek, perilaku merge tidak tertulis, digabung dengan gadget jadi RCE atau XSS. |
-| Request Smuggling | L02, L04, L09, L13 | Front-end dan back-end beda cara baca request, perilaku parser tidak tertulis, urutan request bisa dibalik, dua cara baca bertentangan. |
-| Subdomain Takeover | L02, L03, L06, L07 | Cek cuma di satu tempat, CNAME dipercaya tanpa cek, subdomain bisa dipakai lewat jalur lain, cookie atau OAuth bisa dipindah. |
-| Blind Signing | L02, L03, L05, L08, L09 | Yang tampil beda dari yang di-sign, data dipercaya tanpa cek, digabung dengan request jahat, prompt tetap muncul walau gagal, urutan review bisa dilewati. |
-| Oracle / Replay | L03, L04, L07, L09, L10, L13 | Harga atau signature dipercaya tanpa cek, perilaku oracle tidak tertulis, identitas bisa dipindah, urutan bisa dibalik, efek tidak ikut batal, dua state bertentangan. |
+| IDOR / BOLA (Tenant isolation) | L01, L02, L03, L06, L07, L11 | No ownership check, check only on one path, ID trusted as-is, same object with different permissions, owner can be moved, old access still works. |
+| SSRF | L01, L03, L05, L06, L07, L09 | URL fetched with no allowlist, URL trusted without a check, combined with another feature it reaches internal systems, another path is looser, internal identity is used, check order can be skipped. |
+| ATO / Auth bypass | L01, L02, L03, L07, L11 | No check, check only on one endpoint, token trusted without a check, account can be linked to an attacker, old session still works. |
+| XSS | L01, L03, L05, L06, L09 | Input not checked, data trusted without encoding, combined with another feature, renders differently in each place, render order can be skipped. |
+| SQLi | L01, L03, L04, L09 | Input not checked, query trusted as-is, undocumented database behavior, validation order can be skipped. |
+| RCE | L01, L03, L04, L05, L06 | No check at the execution sink, input trusted, undocumented parser behavior, combined with upload or template, another path is looser. |
+| Business Logic | L03, L05, L09, L10, L13 | Numbers trusted, combined steps become a bypass, step order skipped, side effects still run, two states contradict each other. |
+| Race Condition | L05, L09, L10, L13 | Two requests at once, check-and-use order can flip, side effects do not roll back, dual state contradicts itself. |
+| File Upload / Traversal | L01, L06, L08, L12 | File type not checked, download path has different permissions, failed file still stored, file can be cancelled or replaced by another party. |
+| Host Header / Reset Poisoning | L02, L03, L07 | Host checked in one place only, host from the request trusted, reset link can be moved to an attacker account. |
+| Prototype Pollution | L03, L04, L05 | Merged objects trusted without a check, undocumented merge behavior, combined with a gadget it becomes RCE or XSS. |
+| Request Smuggling | L02, L04, L09, L13 | Front end and back end read the request differently, undocumented parser behavior, request order can be flipped, two readings contradict each other. |
+| Subdomain Takeover | L02, L03, L06, L07 | Check only in one place, CNAME trusted without a check, subdomain usable through another path, cookie or OAuth can be moved. |
+| Blind Signing | L02, L03, L05, L08, L09 | What is shown differs from what is signed, data trusted without a check, combined with a malicious request, prompt still appears after failure, review order can be skipped. |
+| Oracle / Replay | L03, L04, L07, L09, L10, L13 | Price or signature trusted without a check, undocumented oracle behavior, identity can be moved, order can be flipped, effects do not roll back, two states contradict each other. |
 
 ## Chaining
 
-Satu temuan kecil jangan dibuang, cek dulu rantainya. Pola rantai yang
-paling sering naik severity:
+Do not throw away a small finding, check its chain first. The chain
+patterns that most often raise severity:
 
 - API / IDOR -> Auth / ATO -> RCE
 - API / BFLA -> Auth / ATO -> Admin
 - SSRF -> RCE -> Auth / cloud
-- SSRF -> API internal -> Auth / ATO
+- SSRF -> internal API -> Auth / ATO
 - XSS -> Auth / ATO -> API
 - SQLi -> Auth -> RCE
 - Host header -> Auth / ATO (reset poisoning)
@@ -84,341 +86,341 @@ paling sering naik severity:
 - File download IDOR -> Tenant isolation
 - Business logic -> Race -> double benefit
 - Workflow skip -> Business logic / payment
-- Webhook palsu -> Workflow bypass
+- Fake webhook -> Workflow bypass
 - OAuth -> Auth / ATO
 - Oracle -> Settlement accounting
 - Attestation replay -> Settlement accounting
 - Executor claiming -> Settlement accounting
-- Admin / roles -> semua kelas lain
+- Admin / roles -> all other classes
 - Token behaviour -> Settlement accounting
 - Entry paths -> Signing -> Key & seed
-- Backup bocor -> Key & seed
+- Leaked backup -> Key & seed
 - Auth bypass -> Signing
 
-Aturan rantai: kalau satu link di atas terbukti, jangan tutup di kelas
-pertama. Lanjut ke kelas berikutnya di rantai itu sebelum nulis laporan,
-karena severity ikut impact akhir rantai, bukan link pertama.
+Chain rule: if one link above is proven, do not close it at the first
+class. Move to the next class in that chain before writing the report,
+because severity follows the final impact of the chain, not the first
+link.
 
-## Lane A — web2
+## Lane A - web2
 
 Project type: `web2`.
 
-### A1. Tenant isolation & IDOR — id: `tenant-isolation` — lensa: L01, L02, L03, L06, L07, L11
+### A1. Tenant isolation & IDOR - id: `tenant-isolation` - lenses: L01, L02, L03, L06, L07, L11
 
-Invariant: user A tidak bisa baca / ubah / hapus objek milik user B.
-Turunan:
-- BOLA / IDOR: ganti `id`, `uuid`, `project_id`, `account_id` di path /
-  body / query, dapat objek tenant lain (project, file, payout, balance).
-- BFLA: endpoint admin / operator bisa dipanggil role customer biasa.
-- Mass assignment: field `owner_id`, `tenant_id`, `role` bisa di-set
-  lewat body request.
-- IDOR lewat jalur lain: objek yang aman di UI tapi kebuka lewat API
-  lama, export, preview, webhook, atau batch endpoint (L06).
-- Objek setelah revoke / pindah tenant masih bisa diakses (L11).
-Sinyal: endpoint terima ID tanpa cek kepemilikan; daftar objek cuma
-difilter di UI, bukan di query.
-Chain: dapat data tenant lain -> ATO (kalau dapat session / reset token)
--> BFLA (kalau dapat fungsi admin).
+Invariant: user A cannot read / change / delete objects owned by user B.
+Derivatives:
+- BOLA / IDOR: change `id`, `uuid`, `project_id`, `account_id` in path /
+  body / query, get objects from another tenant (project, file, payout, balance).
+- BFLA: admin endpoints callable by a plain customer role.
+- Mass assignment: `owner_id`, `tenant_id`, `role` fields can be set
+  through the request body.
+- IDOR through another path: an object that is safe in the UI but open
+  through an old API, export, preview, webhook, or batch endpoint (L06).
+- Objects still accessible after revoke / tenant move (L11).
+Signals: an endpoint accepts an ID with no ownership check; object lists
+are filtered in the UI only, not in the query.
+Chain: another tenant's data -> ATO (if a session / reset token leaks)
+-> BFLA (if an admin function leaks).
 
-### A2. Business logic: payment / pricing / payout — id: `payment-logic` — lensa: L03, L05, L09, L10, L13
+### A2. Business logic: payment / pricing / payout - id: `payment-logic` - lenses: L03, L05, L09, L10, L13
 
-Invariant: uang / nilai cuma bergerak sesuai aturan bisnis; total,
-harga, dan tujuan tidak bisa diubah sepihak; 1 bayar = 1 manfaat.
-Turunan:
-- Client-computed totals: harga, diskon, pajak, fee dihitung di client
-  lalu dipercaya server.
-- Payout / refund destination swap: tujuan payout atau refund diganti
-  ke rekening / akun attacker.
-- Quota / limit bypass: rollover, budget, kuota, trial dipakai
-  melebihi batas (angka negatif, 0, overflow, reset paksa).
-- State skip: langkah approve / verifikasi / bayar dilewati, langsung
-  ke state settled / approved.
-- Double benefit: 1 pembayaran / kupon / klaim dipakai 2x (butuh race,
-  lihat chain).
-- Currency / amount confusion: amount, mata uang, atau desimal
-  dimanipulasi.
-Sinyal: ada angka / tujuan / status yang datang dari client; ada
-lifecycle yang bisa dilompati.
-Chain: logic flaw + race -> double spend; logic flaw + IDOR -> payout
-milik orang lain.
+Invariant: money / value only moves by the business rules; totals,
+prices, and destinations cannot be changed one-sidedly; 1 payment = 1 benefit.
+Derivatives:
+- Client-computed totals: price, discount, tax, fee computed on the
+  client and then trusted by the server.
+- Payout / refund destination swap: payout or refund destination changed
+  to an attacker account.
+- Quota / limit bypass: rollover, budget, quota, trial used past the
+  limit (negative numbers, 0, overflow, forced reset).
+- State skip: approve / verify / pay steps skipped, straight to
+  settled / approved state.
+- Double benefit: 1 payment / coupon / claim used twice (needs a race,
+  see chain).
+- Currency / amount confusion: amount, currency, or decimals
+  manipulated.
+Signals: numbers / destinations / statuses that come from the client;
+a lifecycle that can be jumped.
+Chain: logic flaw + race -> double spend; logic flaw + IDOR -> someone
+else's payout.
 
-### A3. Auth, session & privilege escalation — id: `auth-session` — lensa: L01, L02, L07, L11
+### A3. Auth, session & privilege escalation - id: `auth-session` - lenses: L01, L02, L07, L11
 
-Invariant: cuma pemilik akun / role yang sah yang bisa bertindak;
-sesi dan token mati setelah logout / revoke / reset password.
-Turunan:
-- ATO lewat password reset: token reset bisa ditebak, dipakai ulang,
-  atau dipakai di akun lain (host header poisoning, token leak di URL).
-- Session fixation / session tidak invalid: sesi lama tetap hidup
-  setelah ganti password atau logout.
-- Privilege escalation: role di body / cookie / JWT diubah, endpoint
-  role tinggi bisa dipanggil role rendah.
-- 2FA bypass: langkah 2FA bisa dilewati, di-skip lewat endpoint lain,
-  atau tidak ditegakkan di API.
-- OAuth / SSO binding: akun bisa di-link ke akun attacker tanpa
-  verifikasi pemilik (L07).
-Sinyal: reset / login / session dipegang endpoint terpisah yang tidak
-berbagi cek yang sama (L02).
-Chain: ATO -> tenant isolation (baca semua objek korban) -> BFLA.
+Invariant: only the rightful account owner / role can act; sessions
+and tokens die after logout / revoke / password reset.
+Derivatives:
+- ATO through password reset: reset token guessable, reusable, or
+  usable on another account (host header poisoning, token leaked in URL).
+- Session fixation / session not invalidated: old session still works
+  after password change or logout.
+- Privilege escalation: role changed in body / cookie / JWT, high-role
+  endpoints callable by a low role.
+- 2FA bypass: the 2FA step can be skipped, bypassed through another
+  endpoint, or is not enforced on the API.
+- OAuth / SSO binding: an account can be linked to an attacker account
+  without owner verification (L07).
+Signals: reset / login / session handled by separate endpoints that do
+not share the same checks (L02).
+Chain: ATO -> tenant isolation (read all victim objects) -> BFLA.
 
-### A4. File upload / download & access — id: `file-handling` — lensa: L01, L06, L08, L12
+### A4. File upload / download & access - id: `file-handling` - lenses: L01, L06, L08, L12
 
-Invariant: file cuma bisa diakses pemiliknya; file yang di-upload
-tidak bisa jadi kode atau jalan keluar dari folder yang diizinkan.
-Turunan:
-- IDOR download: ganti `file_id` / path, download file final / asset
-  customer lain.
-- Path traversal: `../` di nama file atau parameter download.
-- Upload berbahaya: tipe file tidak dicek di server (hanya di UI),
-  SVG / HTML upload jadi stored XSS, file jadi RCE lewat parser.
-- SSRF lewat file: URL / metadata file bikin server fetch URL
-  internal.
-- File yang gagal / ditolak tetap tersimpan dan bisa diakses (L08).
-Sinyal: upload / download terima nama file, path, atau ID dari client.
+Invariant: files are only accessible to their owner; an uploaded file
+cannot become code or escape the allowed folder.
+Derivatives:
+- IDOR download: change `file_id` / path, download another customer's
+  file / asset.
+- Path traversal: `../` in a file name or download parameter.
+- Dangerous upload: file type not checked on the server (UI only),
+  SVG / HTML upload becomes stored XSS, file becomes RCE through a parser.
+- SSRF through a file: file URL / metadata makes the server fetch an
+  internal URL.
+- Failed / rejected files still stored and accessible (L08).
+Signals: upload / download accepts a file name, path, or ID from the client.
 Chain: upload -> XSS / RCE; download IDOR -> tenant isolation.
 
-### A5. Workflow / state-machine bypass — id: `workflow-state` — lensa: L05, L09, L10, L12, L13
+### A5. Workflow / state-machine bypass - id: `workflow-state` - lenses: L05, L09, L10, L12, L13
 
-Invariant: state cuma pindah lewat transisi yang diizinkan, dalam
-urutan yang benar, oleh peran yang benar; state ganda tidak boleh
-bertentangan.
-Turunan:
-- Step skip: approval, review, atau verifikasi dilewati (L09).
-- Undo / cancel oleh pihak yang tidak berhak: cancel payout, batalkan
-  approval, atau kembalikan state orang lain (L12).
-- Rollback bocor: transaksi gagal tapi efek sampingnya jalan
-  (notifikasi terkirim, saldo berubah, file terbuat) (L10).
-- Dual state: status di DB beda dengan status di layanan lain
-  (cache, queue, payment provider), dan celahnya bisa dipakai (L13).
-- Kombinasi aman jadi berbahaya: dua aksi yang aman sendiri-sendiri
-  digabung jadi bypass (L05).
-Sinyal: ada lifecycle multi-langkah (draft -> review -> approve ->
-final) yang dicek di UI saja.
+Invariant: state only moves through allowed transitions, in the right
+order, by the right role; dual states must not contradict each other.
+Derivatives:
+- Step skip: approval, review, or verification skipped (L09).
+- Undo / cancel by an unauthorized party: cancel a payout, revoke an
+  approval, or revert someone else's state (L12).
+- Rollback leak: a failed transaction still leaves side effects
+  (notification sent, balance changed, file created) (L10).
+- Dual state: status in the DB differs from status in another service
+  (cache, queue, payment provider), and the gap is usable (L13).
+- Safe combination becomes dangerous: two actions that are safe alone
+  combine into a bypass (L05).
+Signals: a multi-step lifecycle (draft -> review -> approve ->
+final) checked in the UI only.
 Chain: workflow skip + race -> double benefit; workflow skip ->
 payment logic.
 
-### A6. Integration / webhook / OAuth — id: `integration` — lensa: L02, L03, L04, L06
+### A6. Integration / webhook / OAuth - id: `integration` - lenses: L02, L03, L04, L06
 
-Invariant: event / token dari integrasi cuma dipercaya kalau asalnya
-terverifikasi; 1 integrasi tidak bisa bertindak atas nama tenant lain.
-Turunan:
-- Webhook tanpa verifikasi signature: event palsu dikirim ke endpoint
-  webhook, status / pembayaran diubah.
-- OAuth redirect / token swap: `redirect_uri` atau `code` dipakai
-  lintas akun / tenant.
-- Perilaku pihak ketiga diasumsikan: payload integrasi dipercaya
-  tanpa validasi (L03, L04).
-- Jalur lama integrasi: endpoint integrasi lama / legacy punya cek
-  yang lebih longgar dari endpoint utama (L02, L06).
-Sinyal: ada webhook, OAuth, atau import dari URL.
-Chain: webhook palsu -> workflow bypass; OAuth -> ATO.
+Invariant: events / tokens from an integration are only trusted when
+their origin is verified; one integration cannot act for another tenant.
+Derivatives:
+- Webhook with no signature verification: fake events sent to the
+  webhook endpoint change status / payments.
+- OAuth redirect / token swap: `redirect_uri` or `code` used across
+  accounts / tenants.
+- Third-party behavior assumed: integration payloads trusted
+  without validation (L03, L04).
+- Old integration path: a legacy integration endpoint with looser
+  checks than the main endpoint (L02, L06).
+Signals: a webhook, OAuth, or import from a URL exists.
+Chain: fake webhook -> workflow bypass; OAuth -> ATO.
 
 ---
 
-## Lane B — web3-contract
+## Lane B - web3-contract
 
 Project type: `web3-contract`.
 
-### B1. Settlement accounting: mint / burn / fund conservation — id: `settlement-accounting` — lensa: L01, L03, L05, L10, L13
+### B1. Settlement accounting: mint / burn / fund conservation - id: `settlement-accounting` - lenses: L01, L03, L05, L10, L13
 
-Invariant: Σ mint ≤ escrow / deposit riil; 1 deposit = 1 settle;
-dana keluar tidak boleh lebih besar dari dana masuk.
-Turunan:
-- Mint tanpa backing: mint Hub / token tanpa deposit yang setara.
-- Double-settle: 1 deposit di-settle 2x (fill + refund, fill + fast
-  fill, dua Execution dengan idempotencyKey berbeda).
-- Accounting drift: balance internal beda dengan balance token
-  sebenarnya (fee-on-transfer, rebasing, desimal salah).
-- Burn / release tanpa cek: burn tidak mengurangi hak klaim, atau
-  release jalan tanpa bukti yang sah.
-- Deposit address salah atribusi: sweep masuk ke order yang salah.
-Sinyal: ada mint, burn, escrow, dan settlement di dua tempat
+Invariant: total mint is less than or equal to real escrow / deposits;
+1 deposit = 1 settlement; funds out cannot exceed funds in.
+Derivatives:
+- Mint without backing: Hub / token mint with no matching deposit.
+- Double-settle: 1 deposit settled twice (fill + refund, fill + fast
+  fill, two executions with different idempotency keys).
+- Accounting drift: internal balance differs from the real token
+  balance (fee-on-transfer, rebasing, wrong decimals).
+- Burn / release without a check: burn does not reduce the claim, or
+  release runs with no valid proof.
+- Deposit credited to the wrong order: a sweep lands on the wrong order.
+Signals: mint, burn, escrow, and settlement exist in two places
 (on-chain vs off-chain).
 Chain: accounting + attestation replay -> drain; accounting + oracle
--> settle dengan harga salah.
+-> settle at the wrong price.
 
-### B2. Oracle / price / fee manipulation — id: `oracle-pricing` — lensa: L03, L04, L09, L13
+### B2. Oracle / price / fee manipulation - id: `oracle-pricing` - lenses: L03, L04, L09, L13
 
-Invariant: harga / fee yang dipakai buat settle harus fresh, dari
-sumber terverifikasi, dan tidak bisa dipilih sepihak oleh solver.
-Turunan:
-- Stale price: harga basi dipakai karena `maxAge` tidak dicek
+Invariant: the price / fee used to settle must be fresh, from a
+verified source, and not pickable one-sidedly by a solver.
+Derivatives:
+- Stale price: an old price is used because `maxAge` is not checked
   on-chain.
-- Solver-supplied price: harga yang di-sign solver dipercaya tanpa
-  verifikasi on-chain.
-- Fee / rate limiter bypass: fee 0, fee negatif, atau limiter
-  dilewati lewat jalur lain / pecah transaksi.
-- Price-impact check pakai harga yang salah: harga masuk tidak
-  merefleksikan harga eksekusi sebenarnya.
-Sinyal: harga datang dari off-chain, dari signer, atau dari
-satu sumber tanpa fallback.
-Chain: oracle -> settlement accounting (settle murah, klaim mahal).
+- Solver-supplied price: a solver-signed price trusted with no
+  on-chain verification.
+- Fee / rate limiter bypass: zero fee, negative fee, or limiter
+  bypassed through another path / split transactions.
+- Price-impact check uses the wrong price: the input price does not
+  reflect the real execution price.
+Signals: prices come from off-chain, from a signer, or from a
+single source with no fallback.
+Chain: oracle -> settlement accounting (cheap settle, expensive claim).
 
-### B3. Attestation / signature replay & idempotency — id: `attestation-replay` — lensa: L03, L07, L09, L10
+### B3. Attestation / signature replay & idempotency - id: `attestation-replay` - lenses: L03, L07, L09, L10
 
-Invariant: 1 otorisasi = 1 eksekusi; signature tidak bisa dipakai
-ulang lintas order, chain, atau aksi.
-Turunan:
-- Replay lintas order: signature yang sama dipakai buat dua order
-  berbeda (nonce cuma bagian dari hash, bukan penanda sekali pakai).
-- Replay lintas chain: domain tanpa `chainId` (EIP-712 / Permit)
-  diterima di chain lain.
-- Idempotency palsu: `idempotencyKey` berbeda tapi aksi ekonomi
-  identik, keduanya sukses.
-- Signature malleability / parameter swap: recipient, amount, atau
-  chainId diganti tanpa membatalkan signature.
-Sinyal: ada EIP-712, Permit, attestation, atau proof off-chain.
+Invariant: 1 authorization = 1 execution; a signature cannot be reused
+across orders, chains, or actions.
+Derivatives:
+- Replay across orders: the same signature used for two different
+  orders (nonce is only part of the hash, not a one-time marker).
+- Replay across chains: a domain without `chainId` (EIP-712 / Permit)
+  accepted on another chain.
+- Fake idempotency: different `idempotencyKey` values but identical
+  economic actions, both succeed.
+- Signature malleability / parameter swap: recipient, amount, or
+  chainId changed without invalidating the signature.
+Signals: EIP-712, Permit, attestation, or off-chain proof exists.
 Chain: replay -> settlement accounting (double-settle); replay ->
 executor claiming.
 
-### B4. Executor / solver claiming & access — id: `executor-claim` — lensa: L01, L02, L06, L07
+### B4. Executor / solver claiming & access - id: `executor-claim` - lenses: L01, L02, L06, L07
 
-Invariant: cuma solver / resolver yang dipilih yang boleh eksekusi
-order itu; 1 solver tidak bisa klaim fill solver lain.
-Turunan:
-- Resolver tidak terikat: oracle signature tidak mengikat
-  `callResolver` tertentu, siapa saja bisa eksekusi.
-- Fill orang lain diklaim: Hub balance / reward solver lain
-  diambil lewat jalur eksekusi lain.
-- Withdrawal ke alamat sembarang: withdrawal address / destinasi
-  bisa diubah sepihak tanpa timelock.
-- Jalur eksekusi alternatif: fungsi / kontrak lain mencapai aset
-  yang sama dengan cek yang lebih longgar (L06).
-Sinyal: ada solver, executor, resolver, dan withdrawal.
+Invariant: only the chosen solver / resolver may execute that order;
+one solver cannot claim another solver's fill.
+Derivatives:
+- Resolver not bound: the oracle signature does not bind a specific
+  `callResolver`, so anyone can execute.
+- Someone else's fill claimed: another solver's Hub balance / reward
+  taken through another execution path.
+- Withdrawal to any address: withdrawal address / destination
+  changeable one-sidedly with no timelock.
+- Alternative execution path: another function / contract reaches the
+  same assets with looser checks (L06).
+Signals: a solver, executor, resolver, and withdrawal exist.
 Chain: executor -> settlement accounting; executor -> attestation
-(kalau eksekusi butuh signature).
+(if execution needs a signature).
 
-### B5. Admin / roles & upgrade — id: `admin-roles` — lensa: L01, L07, L11, L12
+### B5. Admin / roles & upgrade - id: `admin-roles` - lenses: L01, L07, L11, L12
 
-Invariant: fungsi admin cuma bisa dipanggil role admin; role yang
-dicabut tidak bisa dipakai lagi; perubahan kritis tidak instan
-tanpa timelock / 2-step.
-Turunan:
-- Missing role check: fungsi admin / config tanpa `onlyOwner` /
+Invariant: admin functions are only callable by the admin role; a
+revoked role cannot be used again; critical changes are not instant
+without a timelock / 2-step process.
+Derivatives:
+- Missing role check: admin / config function with no `onlyOwner` /
   role check (L01).
-- Role direbut: owner / beneficiary / delegate bisa di-rebind ke
-  alamat attacker (L07).
-- Revoke tidak efektif: role / allowance yang dicabut masih bisa
-  dipakai karena cek baca cache / state lama (L11).
-- Perubahan instan: destinasi, oracle, atau parameter kritis diubah
-  sepihak tanpa timelock (L12).
-Sinyal: ada multisig, owner, config, atau upgrade.
-Chain: admin -> semua kelas lain (admin adalah kunci ke accounting,
-oracle, dan executor).
+- Role taken over: owner / beneficiary / delegate can be re-bound to
+  an attacker address (L07).
+- Revoke does not work: a revoked role / allowance is still usable
+  because the check reads a cache / old state (L11).
+- Instant change: destination, oracle, or critical parameter changed
+  one-sidedly with no timelock (L12).
+Signals: a multisig, owner, config, or upgrade exists.
+Chain: admin -> all other classes (admin is the key to accounting,
+oracle, and executor).
 
-### B6. Token behaviour & external calls — id: `token-behaviour` — lensa: L04, L05, L08
+### B6. Token behaviour & external calls - id: `token-behaviour` - lenses: L04, L05, L08
 
-Invariant: kontrak tidak boleh mengasumsikan perilaku token /
-pihak luar yang tidak dijamin.
-Turunan:
-- Fee-on-transfer / rebasing: jumlah yang diterima beda dari jumlah
-  yang dikirim, accounting salah.
-- Hook / callback: token atau pihak luar manggil balik kontrak di
-  tengah eksekusi (reentrancy lewat jalur yang tidak diduga).
-- Call gagal tapi state berubah: external call revert tapi efek
-  samping sudah jalan (L08).
-- Kombinasi: approve + transfer + mint yang aman sendiri-sendiri
-  jadi berbahaya kalau digabung dalam 1 transaksi (L05).
-Sinyal: ada token yang tidak dikenal, callback, atau external call
-di tengah fungsi kritis.
+Invariant: the contract must not assume token / third-party behavior
+that is not guaranteed.
+Derivatives:
+- Fee-on-transfer / rebasing: the amount received differs from the
+  amount sent, accounting breaks.
+- Hook / callback: a token or third party calls back into the contract
+  mid-execution (reentrancy through an unexpected path).
+- Failed call but changed state: an external call reverts but the side
+  effect already ran (L08).
+- Combination: approve + transfer + mint that are safe alone become
+  dangerous combined in 1 transaction (L05).
+Signals: an unknown token, callback, or external call sits inside a
+critical function.
 Chain: token behaviour -> settlement accounting.
 
 ---
 
-## Lane C — wallet
+## Lane C - wallet
 
 Project type: `wallet`.
 
-### C1. Key & seed — id: `key-seed` — lensa: L01, L03, L06, L11, L13
+### C1. Key & seed - id: `key-seed` - lenses: L01, L03, L06, L11, L13
 
-Invariant: operator / pihak luar tidak bisa dapat private key atau
-recovery phrase; key cuma bisa diakses setelah auth; key tidak
-bocor lewat jalur lain.
-Turunan:
-- Key di storage yang salah: key plaintext di file / `UserDefaults` /
-  log, bukan Keychain / Secure Enclave.
-- Key tanpa auth: key bisa dibaca / dipakai tanpa PIN / biometrik.
-- Key bocor lewat backup / log / crash dump / clipboard / screenshot.
-- Key hidup setelah logout / revoke: key / sesi tidak invalid
-  setelah logout (L11).
-- Key ganda bertentangan: key di Keychain beda dengan key di cloud
-  backup, dan celahnya bisa dipakai (L13).
-- Key lewat jalur lain: key yang aman di UI tapi bisa diambil lewat
-  deep link, backup restore, atau export (L06).
-Sinyal: ada vault / envelope, PIN, dan penyimpanan lokal.
-Chain: key bocor -> signing disalahgunakan; key bocor -> semua dana
-di semua chain hilang.
+Invariant: no outsider can obtain the private key or recovery phrase;
+a key is only accessible after auth; a key does not leak through
+another path.
+Derivatives:
+- Key in the wrong storage: plaintext key in a file / `UserDefaults` /
+  log, not in Keychain / Secure Enclave.
+- Key without auth: a key can be read / used with no PIN / biometric.
+- Key leaked through backup / log / crash dump / clipboard / screenshot.
+- Key alive after logout / revoke: key / session not invalidated
+  after logout (L11).
+- Conflicting duplicate keys: the key in Keychain differs from the key
+  in cloud backup, and the gap is usable (L13).
+- Key through another path: a key that is safe in the UI but reachable
+  through a deep link, backup restore, or export (L06).
+Signals: a vault / envelope, PIN, and local storage exist.
+Chain: leaked key -> signing abused; leaked key -> all funds on
+all chains lost.
 
-### C2. Signing & transaction display — id: `signing` — lensa: L02, L03, L05, L08, L09
+### C2. Signing & transaction display - id: `signing` - lenses: L02, L03, L05, L08, L09
 
-Invariant: yang tampil ke user = yang benar-benar di-sign; 1 approve
-= 1 aksi yang tampil; signature tidak bisa dipakai ulang.
-Turunan:
-- Blind signing: destination / calldata tidak tampil, user approve
-  buta.
-- Display mismatch: amount / recipient / network yang tampil beda
-  dari yang di-sign.
-- Permit / EIP-712: field yang di-sign tersembunyi, domain tanpa
-  `chainId` bisa replay lintas chain.
-- Address poisoning: alamat palsu yang mirip ditampilkan supaya
-  user salah kirim.
-- Manipulasi sebelum signing: amount / recipient / fee diubah
-  setelah layar review tapi sebelum signing (L09).
-- Request gagal tapi signing prompt tetap muncul (L08).
-Sinyal: ada layar review, WalletConnect, EIP-712, atau Permit.
-Chain: signing -> key (kalau signing jalan tanpa auth yang benar);
-signing -> entry paths (request jahat masuk lewat dApp).
+Invariant: what the user sees is what actually gets signed; 1 approve
+= 1 displayed action; a signature cannot be reused.
+Derivatives:
+- Blind signing: destination / calldata not shown, user approves blind.
+- Display mismatch: amount / recipient / network shown differ from
+  what is signed.
+- Permit / EIP-712: signed fields hidden, domain without `chainId`
+  replayable across chains.
+- Address poisoning: a lookalike fake address is shown so the user
+  sends to the wrong place.
+- Tampering before signing: amount / recipient / fee changed after the
+  review screen but before signing (L09).
+- Failed request but the signing prompt still appears (L08).
+Signals: a review screen, WalletConnect, EIP-712, or Permit exists.
+Chain: signing -> key (if signing runs without proper auth);
+signing -> entry paths (a malicious request comes in through a dApp).
 
-### C3. Auth, recovery & backup — id: `auth-recovery` — lensa: L01, L03, L06, L11
+### C3. Auth, recovery & backup - id: `auth-recovery` - lenses: L01, L03, L06, L11
 
-Invariant: backup / export / recovery cuma jalan setelah re-auth;
-recovery phrase tidak bocor; auth yang dicabut tidak bisa dipakai lagi.
-Turunan:
-- Export tanpa re-auth: backup diekspor dari device unlocked tanpa
-  PIN / biometrik.
-- Backup lemah: enkripsi backup lemah, password minimum tanpa cek
-  kekuatan, file backup bisa dibuka offline.
-- PIN brute-force offline: PIN 6 digit bisa ditebak offline karena
-  throttling cuma di app, bukan hardware.
-- Recovery phrase handling: seed ditampilkan / disimpan di memory /
-  storage tanpa proteksi, atau di-export lewat jalur yang salah.
-- Import overwrite: import backup menimpa wallet korban tanpa cek.
-Sinyal: ada backup cloud, export, import, PIN, dan biometrik.
-Chain: backup bocor -> key & seed; auth bypass -> signing.
+Invariant: backup / export / recovery only run after re-auth; the
+recovery phrase does not leak; revoked auth cannot be used again.
+Derivatives:
+- Export without re-auth: a backup is exported from an unlocked device
+  with no PIN / biometric.
+- Weak backup: weak backup encryption, minimum password with no
+  strength check, backup file openable offline.
+- PIN brute-forced offline: a 6-digit PIN can be guessed offline
+  because throttling is only in the app, not in hardware.
+- Recovery phrase handling: seed shown / kept in memory / storage
+  with no protection, or exported through the wrong path.
+- Import overwrite: an imported backup overwrites the victim wallet
+  with no check.
+Signals: a cloud backup, export, import, PIN, and biometric exist.
+Chain: leaked backup -> key & seed; auth bypass -> signing.
 
-### C4. Entry paths: deep link / QR / WebView / WalletConnect — id: `entry-paths` — lensa: L02, L03, L05, L06
+### C4. Entry paths: deep link / QR / WebView / WalletConnect - id: `entry-paths` - lenses: L02, L03, L05, L06
 
-Invariant: request dari luar cuma jalan kalau asal dan isinya
-terverifikasi; 1 jalur masuk tidak boleh punya cek yang lebih longgar
-dari jalur lain.
-Turunan:
-- Deep link abuse: deep link scheme / WalletConnect URI dipakai buat injeksi
-  request signing atau ganti state.
-- QR payload jahat: QR berisi recovery / privateKey / WalletConnect
-  URI yang langsung dieksekusi tanpa konfirmasi yang benar.
-- WebView / JS bridge: bridge terekspos ke konten web, XSS di WebView
-  bisa akses fungsi wallet.
-- WalletConnect: session proposal / signing request dari dApp jahat,
-  origin check berjangkar URL klaim attacker.
-- SIWE / TON Connect: origin spoof, login dipakai buat akses yang
-  tidak dimaksud.
-Sinyal: ada deep link, QR scanner, WebView, atau WalletConnect.
-Chain: entry path -> signing (request jahat di-approve); entry path
--> key (payload recovery / privateKey).
+Invariant: outside requests only run when their origin and content are
+verified; one entry path must not have looser checks than another path.
+Derivatives:
+- Deep link abuse: deep link scheme / WalletConnect URI used to inject
+  a signing request or change state.
+- Malicious QR payload: a QR code holds a recovery / privateKey /
+  WalletConnect URI that executes directly with no proper confirmation.
+- WebView / JS bridge: bridge exposed to web content, XSS in the WebView
+  can reach wallet functions.
+- WalletConnect: session proposal / signing request from a malicious
+  dApp, origin check anchored to an attacker-claimed URL.
+- SIWE / TON Connect: origin spoof, login used for access it was not
+  meant for.
+Signals: a deep link, QR scanner, WebView, or WalletConnect exists.
+Chain: entry path -> signing (malicious request gets approved); entry
+path -> key (recovery / privateKey payload).
 
-### C5. Platform & supply chain — id: `platform-supply` — lensa: L04, L06
+### C5. Platform & supply chain - id: `platform-supply` - lenses: L04, L06
 
-Invariant: website / dependency tidak boleh jadi jalan ke wallet;
-perilaku dependency yang tidak diasumsikan harus dibuktikan dampaknya
-di project ini, bukan sekadar versi.
-Turunan:
-- Website IDOR / session: akun di website bisa akses data akun lain.
-- Dependency dipakai dengan cara yang berbahaya: RNG / KDF di binary
-  yang tidak bisa diverifikasi, SDK yang dipercaya tanpa cek.
-- Perilaku SDK tidak terdokumentasi berubah dan cek terlewat (L04).
-Sinyal: ada website, help center, atau dependency binary.
-Chain: platform -> key / signing kalau website atau SDK bisa
-memicu aksi wallet. Kelas ini paling rendah prioritasnya, dicopot
-dulu kalau run sudah 3 kelas.
+Invariant: a website / dependency must not become a path into the
+wallet; unassumed dependency behavior must be proven to matter for
+this project, not just by version.
+Derivatives:
+- Website IDOR / session: an account on the website can access
+  another account's data.
+- Dependency used dangerously: RNG / KDF in an unverifiable binary,
+  an SDK trusted without a check.
+- Undocumented SDK behavior changes and a check is skipped (L04).
+Signals: a website, help center, or binary dependency exists.
+Chain: platform -> key / signing if the website or SDK can trigger
+a wallet action. This class has the lowest priority, drop it first
+when a run already has 3 classes.
 
 ---

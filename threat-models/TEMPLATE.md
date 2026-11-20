@@ -1,4 +1,4 @@
-# Threat model — TEMPLATE
+# Threat model - TEMPLATE
 
 Fill this in per target before running the mutator. The mutator grounds
 every variant in the surfaces and scope listed here. Keep it factual and
@@ -11,23 +11,25 @@ Project type: <web2 | web3-contract | wallet>
      positions change per type. web2 = app/API, web3-contract = smart
      contracts, wallet = mobile/desktop wallet app. Unknown = web2. -->
 
-## Angle prioritas — max 3 kelas (urut impact tertinggi)
+## Priority angle - max 3 classes (highest impact first)
 
-<!-- WAJIB diisi sebelum mutate. Kelas ditentukan di awal, di sini,
-     bukan oleh mutator. Mutator cuma ngembangin varian di dalam kelas
-     yang lu pilih.
-     ATURAN DINAMIS: top 3 beda tiap engagement, tergantung project type.
-     Jangan copy top 3 dari tipe lain. Pilih max 3 dari daftar kandidat
-     tipe project ini di priority-classes.json, lalu URUT ULANG
-     berdasarkan project ini: reward tertinggi, scope yang dibuka,
-     dan bukti / temuan yang sudah ada. Kelas ke-4 dan seterusnya
-     dicopot dari run ini, bukan dihapus dari catatan — masuk round
-     berikutnya kalau signals dari top 3 kering.
-     Format kelas: satu heading ### per kelas, nama kelas setelah "—".
-     Mutator baca heading ini dan auto-pilih lensa yang cocok dengan
-     kelas itu (lihat priority-classes.json, field lenses per kelas).
-     Kalau mau paksa lensa sendiri, pakai flag --lenses saat mutate.
-     Kandidat per tipe (pilih max 3, urut ulang per project):
+<!-- REQUIRED before mutate. Classes are decided up front, here,
+     not by the mutator. The mutator only expands variants inside
+     the classes you pick.
+     DYNAMIC RULE: the top 3 differ per engagement, depending on
+     project type. Do not copy the top 3 from another type. Pick
+     max 3 from the candidate list for this project type in
+     priority-classes.json, then REORDER for this project: highest
+     reward, scope opened up, and evidence or findings already on
+     record. Class 4 and beyond are dropped from this run, not
+     deleted from your notes. They go into the next round if signals
+     from the top 3 run dry.
+     Class format: one ### heading per class, class name after "-".
+     The mutator reads the heading and auto-selects the lenses mapped
+     to that class (see priority-classes.json, the lenses field per
+     class). To force your own lenses, use the --lenses flag at
+     mutate time.
+     Candidates per type (pick max 3, reorder per project):
      - web2: Tenant isolation & IDOR | Business logic: payment /
        pricing / payout | Auth, session & privilege escalation |
        File upload / download & access | Workflow / state-machine
@@ -41,18 +43,18 @@ Project type: <web2 | web3-contract | wallet>
        Auth, recovery & backup | Entry paths: deep link / QR /
        WebView / WalletConnect | Platform & supply chain -->
 
-### Kelas 1 — <nama kelas impact tertinggi di project ini>
+### Class 1 - <highest-impact class name for this project>
 
-- <apa yang dicari di kelas ini, 1-3 bullet>
-- <temuan yang sudah ada di kelas ini, kalau ada>
+- <what to look for in this class, 1-3 bullets>
+- <existing findings in this class, if any>
 
-### Kelas 2 — <nama kelas impact tertinggi kedua>
+### Class 2 - <second-highest-impact class name>
 
-- <apa yang dicari di kelas ini, 1-3 bullet>
+- <what to look for in this class, 1-3 bullets>
 
-### Kelas 3 — <nama kelas impact tertinggi ketiga>
+### Class 3 - <third-highest-impact class name>
 
-- <apa yang dicari di kelas ini, 1-3 bullet>
+- <what to look for in this class, 1-3 bullets>
 
 ## Use cases
 
@@ -84,7 +86,7 @@ Project type: <web2 | web3-contract | wallet>
 
 - <e.g. unauthenticated visitor vs authenticated merchant>
 - <e.g. merchant A vs merchant B (tenant isolation)>
-- <e.g. merchant vs platform operator>
+- <e.g. merchant vs platform admin>
 
 ## Auth / identity
 

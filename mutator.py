@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """prompt-mutator: threat-model-driven prompt mutation for vuln research.
 
-Idea (from the tweet the operator shared): cheap/open-weight models do the
+Idea: cheap/open-weight models do the
 broad search with narrow, goal-specific prompts; a mutator rewrites base
 lenses against the target's threat model; a swarm of agents each gets a
 different starting prompt; signals feed back into the mutator for the next
@@ -13,20 +13,20 @@ scope written in the threat model file.
 
 Subcommands:
   mutate   lenses x threat model -> variant prompts (LLM or template mode)
-  swarm    split new variants into per-agent task files for Hermes
+  swarm    split new variants into per-agent task files
   ingest   read agent signal files -> next-round follow-up variants
   status   show run state (rounds, counts, API usage)
 
 Keys come from the environment only, never from files:
-  STEPFUN_API_KEY  (+ STEPFUN_MODEL, STEPFUN_BASE_URL)
+  OPENAI_API_KEY  (+ OPENAI_MODEL, OPENAI_BASE_URL)
   DEEPSEEK_API_KEY (+ DEEPSEEK_MODEL, DEEPSEEK_BASE_URL)
 
 Examples:
-  python3 mutator.py mutate --threat-model threat-models/TEMPLATE.md --target <NamaTarget> --variants-per-lens 3
-  python3 mutator.py mutate --no-api --threat-model threat-models/TEMPLATE.md --target <NamaTarget>
-  python3 mutator.py swarm --run runs/<target>-<tanggal> --agents 8
-  python3 mutator.py ingest --run runs/<target>-<tanggal> --signals runs/<target>-<tanggal>/signals
-  python3 mutator.py status --run runs/<target>-<tanggal>
+  python3 mutator.py mutate --threat-model threat-models/TEMPLATE.md --target <TargetName> --variants-per-lens 3
+  python3 mutator.py mutate --no-api --threat-model threat-models/TEMPLATE.md --target <TargetName>
+  python3 mutator.py swarm --run runs/<target>-<date> --agents 8
+  python3 mutator.py ingest --run runs/<target>-<date> --signals runs/<target>-<date>/signals
+  python3 mutator.py status --run runs/<target>-<date>
 """
 from __future__ import annotations
 
@@ -50,14 +50,14 @@ MAX_CLASSES_PER_RUN = 3
 MAX_TM_CHARS = 6000  # threat-model excerpt sent to the mutator LLM
 
 PRESETS = {
-    "stepfun": {
-        "base_url": "https://api.stepfun.ai/step_plan/v1",
-        "model": "step-5-preview",
-        "key_env": "STEPFUN_API_KEY",
+    "openai": {
+        "base_url": "https://api.openai.com/v1",
+        "model": "gpt-4o-mini",
+        "key_env": "OPENAI_API_KEY",
     },
     "deepseek": {
         "base_url": "https://api.deepseek.com/v1",
-        "model": "deepseek-flash",
+        "model": "deepseek-chat",
         "key_env": "DEEPSEEK_API_KEY",
     },
 }
@@ -131,7 +131,7 @@ SECTION_KEYWORDS = [
     ("use_cases", ("use case", "user journey", "use-case")),
     ("out_of_scope", ("out of scope", "out-of-scope", "forbidden", "prohibited", "do not")),
     ("scope", ("scope", "in scope", "in-scope")),
-    ("priority_classes", ("angle prioritas", "priority class", "kelas prioritas")),
+    ("priority_classes", ("priority angle", "priority class", "angle prioritas", "kelas prioritas")),
 ]
 
 
@@ -174,10 +174,10 @@ def parse_threat_model(text: str) -> dict:
         heading = re.match(r"^#{1,4}\s+(.+)$", stripped)
         if heading:
             htext = heading.group(1).strip()
-            # Inside Angle prioritas, a "### Kelas N — <name>" heading
+            # Inside the priority section, a "### Class N - <name>" heading
             # IS a class entry, not a new section. Keep the section.
             if current == "priority_classes":
-                m = re.match(r"^[Kk]elas\s+\d+\s*[—\-–:]\s*(.+)$", htext)
+                m = re.match(r"^(?:[Kk]elas|[Cc]lass)\s+\d+\s*[\-:]\s*(.+)$", htext)
                 if m:
                     name = re.sub(r"\s*\(impact[^)]*\)\s*$", "",
                                   m.group(1).strip(), flags=re.I).strip()
@@ -196,8 +196,8 @@ def parse_threat_model(text: str) -> dict:
             model["project_type"] = normalize_project_type(ptype.group(1))
             continue
         bullet = re.match(r"^[-*]\s+(.+)$", stripped) or re.match(r"^\d+[.)]\s+(.+)$", stripped)
-        # Bullets under Angle prioritas are class details, not class
-        # names — class names come only from "### Kelas N — <name>".
+        # Bullets under the priority section are class details, not class
+        # names - class names come only from "### Class N - <name>".
         if bullet and current and current in model and isinstance(model[current], list) \
                 and current != "priority_classes":
             model[current].append(bullet.group(1).strip())
@@ -376,10 +376,9 @@ def _extract_json_array(text: str) -> list:
 
 
 ROLE_PREFIX = (
-    "You are a senior red team operator and professional cyber security "
-    "researcher conducting authorized bug bounty research on an in-scope "
-    "target. Think like an attacker, verify like an auditor: every claim "
-    "needs executed proof. "
+    "You are a senior red team researcher conducting authorized bug bounty "
+    "research on an in-scope target. Think like an attacker, verify like "
+    "an auditor: every claim needs executed proof. "
 )
 
 
@@ -433,9 +432,9 @@ MUTATOR_SYSTEM = (
     "(bug bounty programs, in-scope targets only). You rewrite a base hunting "
     "lens into distinct, concrete, narrow research prompts grounded in the "
     "given threat model. Every prompt you generate must start with this "
-    "role: 'You are a senior red team operator and professional cyber "
-    "security researcher conducting authorized bug bounty research on an "
-    "in-scope target. Think like an attacker, verify like an auditor: "
+    "role: 'You are a senior red team researcher conducting authorized "
+    "bug bounty research on an in-scope target. Think like an attacker, "
+    "verify like an auditor: "
     "every claim needs executed proof.' Never suggest out-of-scope actions. "
     "Return ONLY a JSON array, no other text."
 )
@@ -466,10 +465,9 @@ def llm_variants(client: LLMClient, lens: dict, model: dict, target: str,
         f"- state a narrow, testable goal (one place, one operation)\n"
         f"- state the attacker starting position\n"
         f"- start with the red-team role: 'You are a senior red team "
-        f"operator and professional cyber security researcher conducting "
-        f"authorized bug bounty research on an in-scope target. Think like "
-        f"an attacker, verify like an auditor: every claim needs executed "
-        f"proof.'\n"
+        f"researcher conducting authorized bug bounty research on an "
+        f"in-scope target. Think like an attacker, verify like an auditor: "
+        f"every claim needs executed proof.'\n"
         f"- stay inside the stated scope; never suggest out-of-scope actions\n"
         f"- be written as a direct instruction to a research agent\n\n"
         f"Return ONLY a JSON array of objects with keys "
@@ -517,10 +515,10 @@ def llm_followups(client: LLMClient, lead: str, lens: dict, model: dict,
         f"Threat model (excerpt):\n{model['raw']}\n\n"
         f"Generate exactly {count} distinct follow-up research prompts that dig "
         f"deeper into this signal using the lens above. Each must start with "
-        f"the red-team role: 'You are a senior red team operator and "
-        f"professional cyber security researcher conducting authorized bug "
-        f"bounty research on an in-scope target. Think like an attacker, "
-        f"verify like an auditor: every claim needs executed proof.' Each must name one "
+        f"the red-team role: 'You are a senior red team researcher "
+        f"conducting authorized bug bounty research on an in-scope target. "
+        f"Think like an attacker, verify like an auditor: every claim needs "
+        f"executed proof.' Each must name one "
         f"concrete surface/operation, the use case it targets, one narrow goal, "
         f"and the attacker starting position, using the project type's ({ptype}) "
         f"vocabulary. Stay in scope; never suggest out-of-scope actions.\n\n"
@@ -609,7 +607,7 @@ def cmd_mutate(args) -> int:
     target = args.target or model["target"] or tm_path.stem
     # --- priority classes (dynamic per engagement) ---
     # Precedence: explicit --lenses > explicit --classes >
-    # Angle prioritas in the threat model (top 3) > all 13 lenses.
+    # Priority classes in the threat model (top 3) > all 13 lenses.
     classes_data = load_priority_classes()
     ptype = model.get("project_type", "web2")
     chosen_classes: list[str] = []
@@ -646,7 +644,7 @@ def cmd_mutate(args) -> int:
                 print("[classes] no lens mapping matched the listed "
                       "classes; using all 13 lenses")
         else:
-            print("[classes] no Angle prioritas in threat model; "
+            print("[classes] no priority classes in threat model; "
                   "using all 13 lenses")
     run_dir = new_run_dir(args.out, target)
 
@@ -714,7 +712,7 @@ def cmd_mutate(args) -> int:
     save_manifest(run_dir, manifest)
     variants_path = run_dir / f"variants-round-{round_no}.md"
     with open(variants_path, "w", encoding="utf-8") as f:
-        f.write(f"# Variants — {target} — round {round_no} ({source})\n\n")
+        f.write(f"# Variants - {target} - round {round_no} ({source})\n\n")
         for p in manifest["prompts"]:
             if p["round"] == round_no:
                 f.write(f"## {p['id']} [{p['lens']}] {p['surface']}\n\n{p['prompt']}\n\n")
@@ -786,7 +784,7 @@ def cmd_swarm(args) -> int:
           f"({len(new)} prompt(s) assigned, {len(manifest['prompts']) - len(new)} already assigned before).")
     for f in agent_files:
         print(f"  {f}")
-    print("Hand one file per agent (paste to a Hermes instance).")
+    print("Hand one file per agent.")
     return 0
 
 
@@ -917,8 +915,8 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     def add_llm_opts(p):
-        p.add_argument("--provider", default="stepfun", choices=list(PRESETS),
-                       help="cheap-model provider (default: stepfun)")
+        p.add_argument("--provider", default="openai", choices=list(PRESETS),
+                       help="cheap-model provider (default: openai)")
         p.add_argument("--api-key", default=None,
                        help="API key (prefer env var; never stored)")
         p.add_argument("--base-url", default=None)
@@ -936,7 +934,7 @@ def build_parser() -> argparse.ArgumentParser:
     m.add_argument("--classes", default=None,
                    help="comma list of class ids from priority-classes.json "
                         "for this project type, e.g. key-seed,signing "
-                        "(overrides Angle prioritas in threat model)")
+                        "(overrides priority classes in threat model)")
     m.add_argument("--fresh", action="store_true", help="start a new run even if run dir exists")
     add_llm_opts(m)
     m.set_defaults(func=cmd_mutate)

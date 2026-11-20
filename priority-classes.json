@@ -1,12 +1,12 @@
 {
   "max_classes_per_run": 3,
-  "note": "Kandidat kelas per tipe project, BUKAN top 3 yang fixed. Urutan di sini cuma saran default berdasarkan impact tipikal. Threat model tiap engagement yang menentukan top 3 sebenarnya: pilih max 3 dari daftar tipe itu, urut ulang berdasarkan reward, scope, dan bukti yang sudah ada di project tersebut. Jangan copy top 3 dari tipe lain. Kalau nama kelas di threat model tidak cocok persis, mutator mencocokkan lewat field 'match' (kata kunci).",
+  "note": "Candidate classes per project type, NOT a fixed top 3. The order here is only a default suggestion based on typical impact. Each engagement's threat model decides the real top 3: pick max 3 from the list for that type, reorder by reward, scope, and evidence already on record for that project. Do not copy the top 3 from another type. If a class name in the threat model does not match exactly, the mutator matches through the 'match' field (keywords).",
   "types": {
     "wallet": {
       "candidates": [
         {
           "id": "key-seed",
-          "impact": "Total loss semua dana, semua chain: key bocor atau diakses tanpa auth.",
+          "impact": "Total loss of all funds, all chains: a leaked key, or a key used without auth.",
           "lenses": [
             "L01",
             "L03",
@@ -29,7 +29,7 @@
         },
         {
           "id": "signing",
-          "impact": "Dana hilang satu tap: yang tampil beda dari yang di-sign, replay lintas chain.",
+          "impact": "Funds lost in one tap: what is shown differs from what is signed, replay across chains.",
           "lenses": [
             "L02",
             "L03",
@@ -51,7 +51,7 @@
         },
         {
           "id": "auth-recovery",
-          "impact": "Backup / export tanpa re-auth, recovery phrase bocor, auth di-bypass.",
+          "impact": "Backup or export without re-auth, leaked recovery phrase, bypassed auth.",
           "lenses": [
             "L01",
             "L03",
@@ -73,7 +73,7 @@
         },
         {
           "id": "entry-paths",
-          "impact": "Pintu ke key & signing: dApp / link / QR jahat injeksi request.",
+          "impact": "A door to keys and signing: a malicious dApp, link, or QR code injects a request.",
           "lenses": [
             "L02",
             "L03",
@@ -94,7 +94,7 @@
         },
         {
           "id": "platform-supply",
-          "impact": "Website / dependency dipakai buat akses wallet, dampak kondisional.",
+          "impact": "A website or dependency is used to reach the wallet, impact is conditional.",
           "lenses": [
             "L04",
             "L06"
@@ -115,7 +115,7 @@
       "candidates": [
         {
           "id": "tenant-isolation",
-          "impact": "Akses data / aksi akun lain: project, file, payout, budget.",
+          "impact": "Access to another account's data or actions: projects, files, payouts, budgets.",
           "lenses": [
             "L01",
             "L02",
@@ -138,7 +138,7 @@
         },
         {
           "id": "payment-logic",
-          "impact": "Uang bergerak tanpa bayar, harga / payout dimanipulasi, limit dilewati.",
+          "impact": "Money moves without payment, prices or payouts are manipulated, limits are bypassed.",
           "lenses": [
             "L03",
             "L05",
@@ -162,7 +162,7 @@
         },
         {
           "id": "auth-session",
-          "impact": "Naik peran, sesi orang lain dipakai, akses setelah revoke masih hidup.",
+          "impact": "Privilege escalation, someone else's session is used, access still works after revoke.",
           "lenses": [
             "L01",
             "L02",
@@ -184,7 +184,7 @@
         },
         {
           "id": "file-handling",
-          "impact": "File orang lain di-download, upload jadi eksekusi / traversal.",
+          "impact": "Someone else's files are downloaded, an upload becomes execution or traversal.",
           "lenses": [
             "L01",
             "L06",
@@ -203,7 +203,7 @@
         },
         {
           "id": "workflow-state",
-          "impact": "Langkah approval / verifikasi dilewati, state dibalik tanpa otorisasi.",
+          "impact": "Approval or verification steps are skipped, state is reversed without authorization.",
           "lenses": [
             "L05",
             "L09",
@@ -224,7 +224,7 @@
         },
         {
           "id": "integration",
-          "impact": "Event / token integrasi dipakai buat akses atau aksi lintas akun.",
+          "impact": "An integration event or token is used for access or actions across accounts.",
           "lenses": [
             "L02",
             "L03",
@@ -250,7 +250,7 @@
       "candidates": [
         {
           "id": "settlement-accounting",
-          "impact": "Mint tanpa backing, double-settle, dana keluar lebih besar dari deposit.",
+          "impact": "Minting without backing, double settlement, funds out exceed the deposit.",
           "lenses": [
             "L01",
             "L03",
@@ -274,7 +274,7 @@
         },
         {
           "id": "oracle-pricing",
-          "impact": "Harga basi / palsu dipakai buat settle, fee atau limit dimanipulasi.",
+          "impact": "Stale or fake prices are used to settle, fees or limits are manipulated.",
           "lenses": [
             "L03",
             "L04",
@@ -294,7 +294,7 @@
         },
         {
           "id": "attestation-replay",
-          "impact": "Satu deposit settle berkali-kali, signature dipakai ulang lintas order / chain.",
+          "impact": "One deposit settles many times, a signature is reused across orders or chains.",
           "lenses": [
             "L03",
             "L07",
@@ -314,7 +314,7 @@
         },
         {
           "id": "executor-claim",
-          "impact": "Solver lain klaim fill orang, eksekusi order tanpa jadi resolver yang dipilih.",
+          "impact": "Another solver claims someone else's fill, an order is executed without being the chosen resolver.",
           "lenses": [
             "L01",
             "L02",
@@ -334,7 +334,7 @@
         },
         {
           "id": "admin-roles",
-          "impact": "Role admin direbut atau dipakai buat ubah destinasi / parameter kritis.",
+          "impact": "An admin role is taken over or used to change destinations or critical parameters.",
           "lenses": [
             "L01",
             "L07",
@@ -354,7 +354,7 @@
         },
         {
           "id": "token-behaviour",
-          "impact": "Perilaku token yang tidak diasumsikan bikin accounting atau eksekusi salah.",
+          "impact": "Unassumed token behavior breaks accounting or execution.",
           "lenses": [
             "L04",
             "L05",

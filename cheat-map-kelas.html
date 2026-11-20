@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cheat Map Kelas Bug — Buat Mutator</title>
+<title>Bug Class Cheat Map - For the Mutator</title>
 <style>
 * { box-sizing: border-box; }
 body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #1a1a2e; background: #f4f6fb; line-height: 1.55; }
@@ -63,255 +63,255 @@ pre { background: #1a1a2e; color: #e6edff; padding: 18px; border-radius: 14px; o
 </head>
 <body>
 <header class="hero">
-  <div class="tag">CHEAT MAP &bull; BUAT MUTATOR</div>
-  <h1>Kelas Bug per Lane,<br>Turunan, Lensa &amp; Chaining</h1>
-  <p>Satu file buat nentuin Angle prioritas sebelum <code>mutate</code>. Pilih lane, pilih max 3 kelas, mutator yang bikin variannya.</p>
+  <div class="tag">CHEAT MAP &bull; FOR THE MUTATOR</div>
+  <h1>Bug Classes per Lane,<br>Derivatives, Lenses &amp; Chaining</h1>
+  <p>One file for picking a priority angle before <code>mutate</code>. Pick a lane, pick max 3 classes, and the mutator writes the variants.</p>
 </header>
 <div class="wrap">
 
 <section>
-  <h2><span class="num">1.</span> Cara pakai</h2>
+  <h2><span class="num">1.</span> How to use</h2>
   <div class="steps">
-    <div class="step"><div class="big">1</div><h3>Pilih lane</h3><p>Lane itu jenis projectnya: web2, web3-contract, atau wallet. Lane menentukan daftar kelas yang bisa dipilih.</p></div>
-    <div class="step"><div class="big">2</div><h3>Pilih max 3 kelas</h3><p>Dari lane itu, pilih max 3 kelas yang impactnya paling tinggi di project ini. 1&ndash;2 kelas ideal, 3 kelas itu batas atas.</p></div>
-    <div class="step"><div class="big">3</div><h3>Tulis ke threat model</h3><p>Tulis nama kelasnya persis ke section <b>Angle prioritas</b>. Mutator baca nama itu dan otomatis pilih lensanya.</p></div>
+    <div class="step"><div class="big">1</div><h3>Pick a lane</h3><p>A lane is the project type: web2, web3-contract, or wallet. The lane sets which classes you can pick.</p></div>
+    <div class="step"><div class="big">2</div><h3>Pick max 3 classes</h3><p>From that lane, pick the max 3 classes with the highest impact on this project. 1-2 classes is ideal, 3 classes is the ceiling.</p></div>
+    <div class="step"><div class="big">3</div><h3>Write it into the threat model</h3><p>Write the class name exactly into the <b>Priority angle</b> section. The mutator reads the name and selects the lenses automatically.</p></div>
   </div>
   <div class="formula">
-    <b>Rumus gampang (2 kelas)</b><br>
-    Tiap tema bug punya 2 sampai 5 cara nyari. Kalau pilih 2 tema, cara nyarinya digabung jadi satu. Cara yang sama di dua tema cuma dihitung sekali.<br><br>
-    1. Gabung cara nyari dari 2 tema, buang yang kembar. Hasilnya biasanya 5 sampai 10 cara nyari.<br>
-    2. Kali 3. Tiap cara nyari dibikin 3 versi pertanyaan.<br><br>
-    Jadi 2 tema biasanya jadi <b>15 sampai 30 pertanyaan</b>. Contoh hitung: tema A 5 cara, tema B 5 cara, 1 cara sama. Total cara = 5 + 5 &minus; 1 = 9. Pertanyaan = 9 kali 3 = 27.
+    <b>The easy formula (2 classes)</b><br>
+    Each bug theme has 2 to 5 hunting methods. Pick 2 themes and the methods merge into one set. A method shared by both themes counts once.<br><br>
+    1. Merge the hunting methods from both themes, drop the duplicates. Usually 5 to 10 methods.<br>
+    2. Multiply by 3. Each method becomes 3 question versions.<br><br>
+    So 2 themes usually become <b>15 to 30 questions</b>. Worked example: theme A has 5 methods, theme B has 5, 1 shared. Total methods = 5 + 5 - 1 = 9. Questions = 9 times 3 = 27.
   </div>
 </section>
 
 <section>
-  <h2><span class="num">2.</span> Lensa 1&ndash;13: cara nyari bug</h2>
-  <p class="lead">Lensa itu sudut pandang buat nyari bug. Satu kelas bug biasanya dicari pakai beberapa lensa. Ini daftar lengkapnya, pakai bahasa biasa.</p>
+  <h2><span class="num">2.</span> Lenses 1-13: how to hunt bugs</h2>
+  <p class="lead">A lens is an angle for hunting bugs. One bug class is usually hunted with several lenses. This is the full list, in plain language.</p>
   <div class="lens-grid">
-    <div class="lens"><span class="lid">L01</span><b>Aturan tidak ditegakkan</b><span>Harusnya ada pengecekan, tapi ternyata tidak ada sama sekali.</span></div>
-    <div class="lens"><span class="lid">L02</span><b>Dicek di satu tempat, diasumsikan di tempat lain</b><span>Di jalur A dicek, di jalur B yang menuju aksi yang sama tidak dicek.</span></div>
-    <div class="lens"><span class="lid">L03</span><b>Asumsi tidak pernah dicek</b><span>Aplikasi percaya begitu saja sama data dari luar.</span></div>
-    <div class="lens"><span class="lid">L04</span><b>Perilaku yang tidak tertulis</b><span>Kode ngandelin perilaku library atau sistem yang tidak dijamin.</span></div>
-    <div class="lens"><span class="lid">L05</span><b>Gabungan yang berbahaya</b><span>Satu-satu aman, digabung jadi berbahaya.</span></div>
-    <div class="lens"><span class="lid">L06</span><b>Objek sama, izin beda</b><span>Satu objek bisa diakses lewat banyak jalan, tapi tiap jalan izinnya beda.</span></div>
-    <div class="lens"><span class="lid">L07</span><b>Identitas bisa dipindah</b><span>Pemilik atau identitas suatu objek bisa diubah tanpa cek yang benar.</span></div>
-    <div class="lens"><span class="lid">L08</span><b>Request gagal, efek tetap jalan</b><span>Request ditolak, tapi tetap ada yang berubah atau terkirim.</span></div>
-    <div class="lens"><span class="lid">L09</span><b>Cek cuma jalan kalau urutannya benar</b><span>Kalau langkah dilewati atau dibalik, ceknya ikut kelewat.</span></div>
-    <div class="lens"><span class="lid">L10</span><b>Transaksi gagal, sisa efek nempel</b><span>Transaksi batal, tapi ada efek samping yang tidak ikut batal.</span></div>
-    <div class="lens"><span class="lid">L11</span><b>Akses masih hidup setelah dicabut</b><span>Yang sudah dihapus, logout, atau dicabut aksesnya ternyata masih bisa dipakai.</span></div>
-    <div class="lens"><span class="lid">L12</span><b>Undo yang tidak berhak</b><span>Perubahan bisa dibatalkan sama orang yang seharusnya tidak boleh.</span></div>
-    <div class="lens"><span class="lid">L13</span><b>Dua keadaan yang bertentangan</b><span>Satu objek bisa ada di dua keadaan yang berlawanan di saat yang sama.</span></div>
+    <div class="lens"><span class="lid">L01</span><b>Missing enforcement</b><span>There should be a check, but there is none at all.</span></div>
+    <div class="lens"><span class="lid">L02</span><b>Enforced here, assumed there</b><span>Checked on path A, not checked on path B to the same action.</span></div>
+    <div class="lens"><span class="lid">L03</span><b>Unchecked assumption</b><span>The app trusts outside data without checking it.</span></div>
+    <div class="lens"><span class="lid">L04</span><b>Undocumented behavior dependency</b><span>Code relies on library or system behavior that is not guaranteed.</span></div>
+    <div class="lens"><span class="lid">L05</span><b>Unsafe composition</b><span>Safe one by one, dangerous combined.</span></div>
+    <div class="lens"><span class="lid">L06</span><b>Same object, different permissions</b><span>One object is reachable through many paths, with different permissions on each.</span></div>
+    <div class="lens"><span class="lid">L07</span><b>Identity rebinding</b><span>The owner or identity of an object can change without a proper check.</span></div>
+    <div class="lens"><span class="lid">L08</span><b>Failed request, real side effect</b><span>A request is rejected, but something still changes or gets sent.</span></div>
+    <div class="lens"><span class="lid">L09</span><b>Order-dependent check</b><span>If a step is skipped or reversed, the check is skipped too.</span></div>
+    <div class="lens"><span class="lid">L10</span><b>Failed transaction, lingering effect</b><span>A transaction is cancelled, but a side effect does not roll back with it.</span></div>
+    <div class="lens"><span class="lid">L11</span><b>Access after delete or revoke</b><span>Something deleted, logged out, or revoked can still be used.</span></div>
+    <div class="lens"><span class="lid">L12</span><b>Unauthorized undo</b><span>A change can be undone by someone who should not be allowed to.</span></div>
+    <div class="lens"><span class="lid">L13</span><b>Contradictory dual state</b><span>One object can sit in two opposing states at the same time.</span></div>
   </div>
-  <div class="note" style="margin-top:16px"><b>Gampang ketuker?</b> L01 itu tidak ada cek sama sekali. L02 itu ceknya ada tapi cuma di satu jalur. L03 itu percaya data tanpa cek. L08 itu request yang gagal, L10 itu transaksi yang batal.</div>
+  <div class="note" style="margin-top:16px"><b>Easy to mix up?</b> L01 means no check at all. L02 means the check exists but only on one path. L03 means data is trusted without a check. L08 is a failed request, L10 is a cancelled transaction.</div>
 </section>
 
 <section>
-  <h2><span class="num">3.</span> Lane A — web2</h2>
-  <p class="lead">6 kelas. Kelas paling tinggi secara umum: Tenant isolation &amp; IDOR. Kalau projectnya intinya soal uang, Business logic payment bisa naik jadi nomor 1.</p>
+  <h2><span class="num">3.</span> Lane A - web2</h2>
+  <p class="lead">6 classes. The highest class in general: Tenant isolation &amp; IDOR. If the project is mostly about money, Business logic payment can move up to number 1.</p>
   <div class="lane web2">
-    <h3>Lane A — web2</h3>
-    <p class="sub">Aplikasi dan API: akun, pembayaran, file, dan alur kerja.</p>
+    <h3>Lane A - web2</h3>
+    <p class="sub">Apps and APIs: accounts, payments, files, and workflows.</p>
 
     <div class="card">
       <h4>A1. Tenant isolation &amp; IDOR</h4>
       <div class="chips"><span class="chip">tenant-isolation</span><span class="chip lens">L01</span><span class="chip lens">L02</span><span class="chip lens">L03</span><span class="chip lens">L06</span><span class="chip lens">L07</span><span class="chip lens">L11</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> user A tidak bisa baca, ubah, atau hapus punya user B.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>IDOR / BOLA: ganti ID di request, dapat objek milik tenant lain.</li><li>BFLA: endpoint admin bisa dipanggil role biasa.</li><li>Mass assignment: field pemilik atau role bisa di-set lewat body request.</li><li>IDOR lewat jalur lain: aman di UI, kebuka lewat API lama, export, atau preview.</li><li>Objek setelah revoke atau pindah tenant masih bisa diakses.</li></ul>
-      <div class="chain"><b>Rantai:</b> dapat data tenant lain &rarr; Auth / ATO &rarr; fungsi admin.</div>
+      <p><span class="label">Invariant:</span> user A cannot read, change, or delete what belongs to user B.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>IDOR / BOLA: change the ID in the request, get objects owned by another tenant.</li><li>BFLA: admin endpoints callable by a plain role.</li><li>Mass assignment: owner or role fields can be set through the request body.</li><li>IDOR through another path: safe in the UI, open through an old API, export, or preview.</li><li>Objects still accessible after revoke or tenant move.</li></ul>
+      <div class="chain"><b>Chain:</b> another tenant's data &rarr; Auth / ATO &rarr; admin functions.</div>
     </div>
 
     <div class="card">
       <h4>A2. Business logic: payment / pricing / payout</h4>
       <div class="chips"><span class="chip">payment-logic</span><span class="chip lens">L03</span><span class="chip lens">L05</span><span class="chip lens">L09</span><span class="chip lens">L10</span><span class="chip lens">L13</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> uang cuma bergerak sesuai aturan bisnis. Total, harga, dan tujuan tidak bisa diubah sepihak. Satu bayar, satu manfaat.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Harga, diskon, atau fee dihitung di client lalu dipercaya server.</li><li>Tujuan payout atau refund diganti ke akun attacker.</li><li>Kuota, budget, atau trial dipakai melebihi batas.</li><li>Langkah approve, verifikasi, atau bayar dilewati.</li><li>Satu pembayaran, kupon, atau klaim dipakai 2 kali.</li><li>Amount, mata uang, atau desimal dimanipulasi.</li></ul>
-      <div class="chain"><b>Rantai:</b> logic flaw + race &rarr; double spend. Logic flaw + IDOR &rarr; payout milik orang lain.</div>
+      <p><span class="label">Invariant:</span> money only moves by the business rules. Totals, prices, and destinations cannot be changed one-sidedly. One payment, one benefit.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Prices, discounts, or fees computed on the client and then trusted by the server.</li><li>Payout or refund destination changed to an attacker account.</li><li>Quota, budget, or trial used past the limit.</li><li>Approve, verify, or pay steps skipped.</li><li>One payment, coupon, or claim used 2 times.</li><li>Amount, currency, or decimals manipulated.</li></ul>
+      <div class="chain"><b>Chain:</b> logic flaw + race &rarr; double spend. Logic flaw + IDOR &rarr; someone else's payout.</div>
     </div>
 
     <div class="card">
       <h4>A3. Auth, session &amp; privilege escalation</h4>
       <div class="chips"><span class="chip">auth-session</span><span class="chip lens">L01</span><span class="chip lens">L02</span><span class="chip lens">L07</span><span class="chip lens">L11</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> cuma pemilik akun atau role yang sah yang bisa bertindak. Sesi dan token mati setelah logout, revoke, atau ganti password.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Takeover lewat password reset: token bisa ditebak, dipakai ulang, atau dipakai di akun lain.</li><li>Sesi lama tetap hidup setelah ganti password atau logout.</li><li>Role diubah lewat body, cookie, atau token, lalu endpoint role tinggi bisa dipanggil.</li><li>Langkah 2FA bisa dilewati lewat endpoint lain.</li><li>Akun bisa di-link ke akun attacker tanpa verifikasi pemilik.</li></ul>
-      <div class="chain"><b>Rantai:</b> Auth / ATO &rarr; Tenant isolation &rarr; fungsi admin.</div>
+      <p><span class="label">Invariant:</span> only the rightful account owner or role can act. Sessions and tokens die after logout, revoke, or password change.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Takeover through password reset: token guessable, reusable, or usable on another account.</li><li>Old session still works after password change or logout.</li><li>Role changed through body, cookie, or token, then a high-role endpoint becomes callable.</li><li>The 2FA step can be skipped through another endpoint.</li><li>An account can be linked to an attacker account without owner verification.</li></ul>
+      <div class="chain"><b>Chain:</b> Auth / ATO &rarr; Tenant isolation &rarr; admin functions.</div>
     </div>
 
     <div class="card">
       <h4>A4. File upload / download &amp; access</h4>
       <div class="chips"><span class="chip">file-handling</span><span class="chip lens">L01</span><span class="chip lens">L06</span><span class="chip lens">L08</span><span class="chip lens">L12</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> file cuma bisa diakses pemiliknya. File yang di-upload tidak bisa jadi kode atau keluar dari folder yang diizinkan.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>IDOR download: ganti ID file, download file milik orang lain.</li><li>Path traversal: keluar dari folder yang diizinkan lewat nama file.</li><li>Upload berbahaya: tipe file cuma dicek di UI, file jadi XSS atau RCE lewat parser.</li><li>SSRF lewat file: URL atau metadata file bikin server fetch URL internal.</li><li>File yang gagal atau ditolak tetap tersimpan dan bisa diakses.</li></ul>
-      <div class="chain"><b>Rantai:</b> upload &rarr; XSS / RCE. Download IDOR &rarr; Tenant isolation.</div>
+      <p><span class="label">Invariant:</span> files are only accessible to their owner. An uploaded file cannot become code or leave the allowed folder.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>IDOR download: change the file ID, download someone else's file.</li><li>Path traversal: leave the allowed folder through the file name.</li><li>Dangerous upload: file type checked in the UI only, file becomes XSS or RCE through a parser.</li><li>SSRF through a file: file URL or metadata makes the server fetch an internal URL.</li><li>A failed or rejected file is still stored and accessible.</li></ul>
+      <div class="chain"><b>Chain:</b> upload &rarr; XSS / RCE. Download IDOR &rarr; Tenant isolation.</div>
     </div>
 
     <div class="card">
       <h4>A5. Workflow / state-machine bypass</h4>
       <div class="chips"><span class="chip">workflow-state</span><span class="chip lens">L05</span><span class="chip lens">L09</span><span class="chip lens">L10</span><span class="chip lens">L12</span><span class="chip lens">L13</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> state cuma pindah lewat transisi yang diizinkan, dalam urutan yang benar, oleh peran yang benar.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Langkah approval, review, atau verifikasi dilewati.</li><li>Cancel atau undo oleh pihak yang tidak berhak.</li><li>Transaksi gagal tapi efek sampingnya tetap jalan.</li><li>Status di database beda dengan status di layanan lain, dan celahnya bisa dipakai.</li><li>Dua aksi yang aman sendiri-sendiri digabung jadi bypass.</li></ul>
-      <div class="chain"><b>Rantai:</b> workflow skip + race &rarr; double benefit. Workflow skip &rarr; payment logic.</div>
+      <p><span class="label">Invariant:</span> state only moves through allowed transitions, in the right order, by the right role.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Approval, review, or verification steps skipped.</li><li>Cancel or undo by an unauthorized party.</li><li>A failed transaction still leaves side effects.</li><li>Status in the database differs from status in another service, and the gap is usable.</li><li>Two actions that are safe alone combine into a bypass.</li></ul>
+      <div class="chain"><b>Chain:</b> workflow skip + race &rarr; double benefit. Workflow skip &rarr; payment logic.</div>
     </div>
 
     <div class="card">
       <h4>A6. Integration / webhook / OAuth</h4>
       <div class="chips"><span class="chip">integration</span><span class="chip lens">L02</span><span class="chip lens">L03</span><span class="chip lens">L04</span><span class="chip lens">L06</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> event atau token dari integrasi cuma dipercaya kalau asalnya terverifikasi. Satu integrasi tidak bisa bertindak atas nama tenant lain.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Webhook tanpa verifikasi signature: event palsu ubah status atau pembayaran.</li><li>OAuth redirect atau token dipakai lintas akun atau tenant.</li><li>Payload integrasi dipercaya tanpa validasi.</li><li>Endpoint integrasi lama punya cek yang lebih longgar dari endpoint utama.</li></ul>
-      <div class="chain"><b>Rantai:</b> webhook palsu &rarr; workflow bypass. OAuth &rarr; Auth / ATO.</div>
+      <p><span class="label">Invariant:</span> events or tokens from an integration are only trusted when their origin is verified. One integration cannot act for another tenant.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Webhook with no signature verification: fake events change status or payments.</li><li>OAuth redirect or token used across accounts or tenants.</li><li>Integration payloads trusted without validation.</li><li>Old integration endpoints with looser checks than the main endpoint.</li></ul>
+      <div class="chain"><b>Chain:</b> fake webhook &rarr; workflow bypass. OAuth &rarr; Auth / ATO.</div>
     </div>
   </div>
 </section>
 
 <section>
-  <h2><span class="num">4.</span> Lane B — web3-contract</h2>
-  <p class="lead">6 kelas. Kelas paling tinggi secara umum: Settlement accounting. Dana keluar tidak boleh lebih besar dari dana masuk.</p>
+  <h2><span class="num">4.</span> Lane B - web3-contract</h2>
+  <p class="lead">6 classes. The highest class in general: Settlement accounting. Funds out cannot exceed funds in.</p>
   <div class="lane web3">
-    <h3>Lane B — web3-contract</h3>
-    <p class="sub">Smart contract: settlement, oracle, attestation, dan eksekusi.</p>
+    <h3>Lane B - web3-contract</h3>
+    <p class="sub">Smart contracts: settlement, oracles, attestations, and execution.</p>
 
     <div class="card">
       <h4>B1. Settlement accounting: mint / burn / fund conservation</h4>
       <div class="chips"><span class="chip">settlement-accounting</span><span class="chip lens">L01</span><span class="chip lens">L03</span><span class="chip lens">L05</span><span class="chip lens">L10</span><span class="chip lens">L13</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> total mint tidak lebih besar dari deposit riil. Satu deposit, satu settle.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Mint tanpa backing: mint tanpa deposit yang setara.</li><li>Double-settle: satu deposit di-settle 2 kali.</li><li>Accounting drift: balance internal beda dengan balance token sebenarnya.</li><li>Burn atau release tanpa cek yang sah.</li><li>Sweep deposit masuk ke order yang salah.</li></ul>
-      <div class="chain"><b>Rantai:</b> accounting + attestation replay &rarr; drain. Accounting + oracle &rarr; settle dengan harga salah.</div>
+      <p><span class="label">Invariant:</span> total mint is not larger than real deposits. One deposit, one settlement.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Mint without backing: mint with no matching deposit.</li><li>Double-settle: one deposit settled 2 times.</li><li>Accounting drift: internal balance differs from the real token balance.</li><li>Burn or release without a valid check.</li><li>A deposit sweep lands on the wrong order.</li></ul>
+      <div class="chain"><b>Chain:</b> accounting + attestation replay &rarr; drain. Accounting + oracle &rarr; settle at the wrong price.</div>
     </div>
 
     <div class="card">
       <h4>B2. Oracle / price / fee manipulation</h4>
       <div class="chips"><span class="chip">oracle-pricing</span><span class="chip lens">L03</span><span class="chip lens">L04</span><span class="chip lens">L09</span><span class="chip lens">L13</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> harga dan fee yang dipakai buat settle harus fresh, dari sumber terverifikasi, dan tidak bisa dipilih sepihak.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Harga basi dipakai karena batas umur harga tidak dicek on-chain.</li><li>Harga yang di-sign solver dipercaya tanpa verifikasi on-chain.</li><li>Fee nol, fee negatif, atau limiter dilewati lewat jalur lain.</li><li>Cek price-impact pakai harga yang salah.</li></ul>
-      <div class="chain"><b>Rantai:</b> oracle &rarr; settlement accounting (settle murah, klaim mahal).</div>
+      <p><span class="label">Invariant:</span> prices and fees used to settle must be fresh, from a verified source, and not pickable one-sidedly.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Stale prices used because the price age limit is not checked on-chain.</li><li>A solver-signed price trusted with no on-chain verification.</li><li>Zero fee, negative fee, or limiter bypassed through another path.</li><li>Price-impact check uses the wrong price.</li></ul>
+      <div class="chain"><b>Chain:</b> oracle &rarr; settlement accounting (cheap settle, expensive claim).</div>
     </div>
 
     <div class="card">
       <h4>B3. Attestation / signature replay &amp; idempotency</h4>
       <div class="chips"><span class="chip">attestation-replay</span><span class="chip lens">L03</span><span class="chip lens">L07</span><span class="chip lens">L09</span><span class="chip lens">L10</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> satu otorisasi, satu eksekusi. Signature tidak bisa dipakai ulang lintas order, chain, atau aksi.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Replay lintas order: signature yang sama dipakai buat dua order berbeda.</li><li>Replay lintas chain: domain tanpa chainId diterima di chain lain.</li><li>Idempotency palsu: kunci beda tapi aksi ekonomi identik, keduanya sukses.</li><li>Recipient, amount, atau chainId diganti tanpa membatalkan signature.</li></ul>
-      <div class="chain"><b>Rantai:</b> replay &rarr; settlement accounting (double-settle). Replay &rarr; executor claiming.</div>
+      <p><span class="label">Invariant:</span> one authorization, one execution. A signature cannot be reused across orders, chains, or actions.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Replay across orders: the same signature used for two different orders.</li><li>Replay across chains: a domain without chainId accepted on another chain.</li><li>Fake idempotency: different keys but identical economic actions, both succeed.</li><li>Recipient, amount, or chainId changed without invalidating the signature.</li></ul>
+      <div class="chain"><b>Chain:</b> replay &rarr; settlement accounting (double-settle). Replay &rarr; executor claiming.</div>
     </div>
 
     <div class="card">
       <h4>B4. Executor / solver claiming &amp; access</h4>
       <div class="chips"><span class="chip">executor-claim</span><span class="chip lens">L01</span><span class="chip lens">L02</span><span class="chip lens">L06</span><span class="chip lens">L07</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> cuma solver atau resolver yang dipilih yang boleh eksekusi order itu. Satu solver tidak bisa klaim fill solver lain.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Resolver tidak terikat: signature tidak mengikat resolver tertentu, siapa saja bisa eksekusi.</li><li>Fill atau reward solver lain diambil lewat jalur eksekusi lain.</li><li>Alamat withdrawal bisa diubah sepihak tanpa timelock.</li><li>Fungsi atau kontrak lain mencapai aset yang sama dengan cek yang lebih longgar.</li></ul>
-      <div class="chain"><b>Rantai:</b> executor &rarr; settlement accounting. Executor &rarr; attestation.</div>
+      <p><span class="label">Invariant:</span> only the chosen solver or resolver may execute that order. One solver cannot claim another solver's fill.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Resolver not bound: the signature does not bind a specific resolver, anyone can execute.</li><li>Another solver's fill or reward taken through another execution path.</li><li>Withdrawal address changeable one-sidedly with no timelock.</li><li>Another function or contract reaches the same assets with looser checks.</li></ul>
+      <div class="chain"><b>Chain:</b> executor &rarr; settlement accounting. Executor &rarr; attestation.</div>
     </div>
 
     <div class="card">
       <h4>B5. Admin / roles &amp; upgrade</h4>
       <div class="chips"><span class="chip">admin-roles</span><span class="chip lens">L01</span><span class="chip lens">L07</span><span class="chip lens">L11</span><span class="chip lens">L12</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> fungsi admin cuma bisa dipanggil role admin. Role yang dicabut tidak bisa dipakai lagi. Perubahan kritis tidak instan tanpa timelock.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Fungsi admin atau config tanpa cek role.</li><li>Owner, beneficiary, atau delegate bisa di-rebind ke alamat attacker.</li><li>Role atau allowance yang dicabut masih bisa dipakai.</li><li>Destinasi, oracle, atau parameter kritis diubah sepihak tanpa timelock.</li></ul>
-      <div class="chain"><b>Rantai:</b> admin &rarr; semua kelas lain. Admin adalah kunci ke accounting, oracle, dan executor.</div>
+      <p><span class="label">Invariant:</span> admin functions are only callable by the admin role. A revoked role cannot be used again. Critical changes are not instant without a timelock.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Admin or config function with no role check.</li><li>Owner, beneficiary, or delegate can be re-bound to an attacker address.</li><li>A revoked role or allowance can still be used.</li><li>Destination, oracle, or critical parameter changed one-sidedly with no timelock.</li></ul>
+      <div class="chain"><b>Chain:</b> admin &rarr; all other classes. Admin is the key to accounting, oracle, and executor.</div>
     </div>
 
     <div class="card">
       <h4>B6. Token behaviour &amp; external calls</h4>
       <div class="chips"><span class="chip">token-behaviour</span><span class="chip lens">L04</span><span class="chip lens">L05</span><span class="chip lens">L08</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> kontrak tidak boleh mengasumsikan perilaku token atau pihak luar yang tidak dijamin.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Fee-on-transfer atau rebasing: jumlah yang diterima beda dari yang dikirim, accounting salah.</li><li>Hook atau callback: pihak luar manggil balik kontrak di tengah eksekusi.</li><li>Call gagal tapi state sudah berubah.</li><li>Approve + transfer + mint yang aman sendiri-sendiri jadi berbahaya kalau digabung.</li></ul>
-      <div class="chain"><b>Rantai:</b> token behaviour &rarr; settlement accounting.</div>
+      <p><span class="label">Invariant:</span> the contract must not assume token or third-party behavior that is not guaranteed.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Fee-on-transfer or rebasing: the amount received differs from the amount sent, accounting breaks.</li><li>Hook or callback: an outside party calls back into the contract mid-execution.</li><li>Call fails but state already changed.</li><li>Approve + transfer + mint that are safe alone become dangerous combined.</li></ul>
+      <div class="chain"><b>Chain:</b> token behaviour &rarr; settlement accounting.</div>
     </div>
   </div>
 </section>
 
 <section>
-  <h2><span class="num">5.</span> Lane C — wallet</h2>
-  <p class="lead">5 kelas. Kelas paling tinggi secara umum: Key &amp; seed. Kalau key bocor, semua dana di semua chain hilang.</p>
+  <h2><span class="num">5.</span> Lane C - wallet</h2>
+  <p class="lead">5 classes. The highest class in general: Key &amp; seed. If the key leaks, all funds on all chains are lost.</p>
   <div class="lane wallet">
-    <h3>Lane C — wallet</h3>
-    <p class="sub">Dompet di device: key, signing, backup, dan jalur masuk.</p>
+    <h3>Lane C - wallet</h3>
+    <p class="sub">Wallets on device: keys, signing, backup, and entry paths.</p>
 
     <div class="card">
       <h4>C1. Key &amp; seed</h4>
       <div class="chips"><span class="chip">key-seed</span><span class="chip lens">L01</span><span class="chip lens">L03</span><span class="chip lens">L06</span><span class="chip lens">L11</span><span class="chip lens">L13</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> pihak luar tidak bisa dapat private key atau recovery phrase. Key cuma bisa diakses setelah auth. Key tidak bocor lewat jalur lain.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Key plaintext di file atau log, bukan di penyimpanan aman device.</li><li>Key bisa dibaca atau dipakai tanpa PIN atau biometrik.</li><li>Key bocor lewat backup, log, crash dump, clipboard, atau screenshot.</li><li>Key atau sesi tidak invalid setelah logout.</li><li>Key di penyimpanan device beda dengan key di cloud backup, dan celahnya bisa dipakai.</li><li>Key yang aman di UI tapi bisa diambil lewat deep link, backup restore, atau export.</li></ul>
-      <div class="chain"><b>Rantai:</b> key bocor &rarr; signing disalahgunakan. Key bocor &rarr; semua dana di semua chain hilang.</div>
+      <p><span class="label">Invariant:</span> no outsider can obtain the private key or recovery phrase. A key is only accessible after auth. A key does not leak through another path.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Plaintext key in a file or log, not in the device's secure storage.</li><li>Key readable or usable with no PIN or biometric.</li><li>Key leaked through backup, log, crash dump, clipboard, or screenshot.</li><li>Key or session not invalidated after logout.</li><li>Key in device storage differs from the key in cloud backup, and the gap is usable.</li><li>Key that is safe in the UI but reachable through a deep link, backup restore, or export.</li></ul>
+      <div class="chain"><b>Chain:</b> leaked key &rarr; signing abused. Leaked key &rarr; all funds on all chains lost.</div>
     </div>
 
     <div class="card">
       <h4>C2. Signing &amp; transaction display</h4>
       <div class="chips"><span class="chip">signing</span><span class="chip lens">L02</span><span class="chip lens">L03</span><span class="chip lens">L05</span><span class="chip lens">L08</span><span class="chip lens">L09</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> yang tampil ke user sama dengan yang benar-benar di-sign. Satu approve, satu aksi yang tampil. Signature tidak bisa dipakai ulang.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Blind signing: tujuan dan isi transaksi tidak tampil, user approve buta.</li><li>Display mismatch: amount, recipient, atau network yang tampil beda dari yang di-sign.</li><li>Permit atau typed data: field yang di-sign tersembunyi, domain tanpa chainId bisa replay lintas chain.</li><li>Address poisoning: alamat palsu yang mirip ditampilkan supaya user salah kirim.</li><li>Amount, recipient, atau fee diubah setelah layar review tapi sebelum signing.</li><li>Request gagal tapi prompt signing tetap muncul.</li></ul>
-      <div class="chain"><b>Rantai:</b> signing &rarr; key (kalau signing jalan tanpa auth yang benar). Signing &rarr; entry paths (request jahat masuk lewat dApp).</div>
+      <p><span class="label">Invariant:</span> what the user sees is what actually gets signed. One approval, one displayed action. A signature cannot be reused.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Blind signing: destination and transaction content not shown, user approves blind.</li><li>Display mismatch: amount, recipient, or network shown differ from what is signed.</li><li>Permit or typed data: signed fields hidden, domain without chainId replayable across chains.</li><li>Address poisoning: a lookalike fake address is shown so the user sends to the wrong place.</li><li>Amount, recipient, or fee changed after the review screen but before signing.</li><li>Request fails but the signing prompt still appears.</li></ul>
+      <div class="chain"><b>Chain:</b> signing &rarr; key (if signing runs without proper auth). Signing &rarr; entry paths (a malicious request comes in through a dApp).</div>
     </div>
 
     <div class="card">
       <h4>C3. Auth, recovery &amp; backup</h4>
       <div class="chips"><span class="chip">auth-recovery</span><span class="chip lens">L01</span><span class="chip lens">L03</span><span class="chip lens">L06</span><span class="chip lens">L11</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> backup, export, dan recovery cuma jalan setelah re-auth. Recovery phrase tidak bocor. Auth yang dicabut tidak bisa dipakai lagi.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Backup diekspor dari device unlocked tanpa PIN atau biometrik.</li><li>Enkripsi backup lemah, password minimum tanpa cek kekuatan, file backup bisa dibuka offline.</li><li>PIN 6 digit bisa ditebak offline karena throttling cuma di aplikasi, bukan hardware.</li><li>Seed ditampilkan atau disimpan di memory atau storage tanpa proteksi.</li><li>Import backup menimpa wallet korban tanpa cek.</li></ul>
-      <div class="chain"><b>Rantai:</b> backup bocor &rarr; key &amp; seed. Auth bypass &rarr; signing.</div>
+      <p><span class="label">Invariant:</span> backup, export, and recovery only run after re-auth. The recovery phrase does not leak. Revoked auth cannot be used again.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Backup exported from an unlocked device with no PIN or biometric.</li><li>Weak backup encryption, minimum password with no strength check, backup file openable offline.</li><li>A 6-digit PIN guessable offline because throttling is only in the app, not in hardware.</li><li>Seed shown or kept in memory or storage with no protection.</li><li>Imported backup overwrites the victim wallet with no check.</li></ul>
+      <div class="chain"><b>Chain:</b> leaked backup &rarr; key &amp; seed. Auth bypass &rarr; signing.</div>
     </div>
 
     <div class="card">
       <h4>C4. Entry paths: deep link / QR / WebView / WalletConnect</h4>
       <div class="chips"><span class="chip">entry-paths</span><span class="chip lens">L02</span><span class="chip lens">L03</span><span class="chip lens">L05</span><span class="chip lens">L06</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> request dari luar cuma jalan kalau asal dan isinya terverifikasi. Satu jalur masuk tidak boleh punya cek yang lebih longgar dari jalur lain.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Deep link abuse: deep link dipakai buat injeksi request signing atau ganti state.</li><li>QR payload jahat: QR berisi recovery, private key, atau WalletConnect URI yang langsung dieksekusi.</li><li>WebView atau JS bridge: bridge terekspos ke konten web, XSS di WebView bisa akses fungsi wallet.</li><li>WalletConnect: session atau signing request dari dApp jahat, origin check berjangkar URL klaim attacker.</li><li>Login sosial atau connect: origin spoof, login dipakai buat akses yang tidak dimaksud.</li></ul>
-      <div class="chain"><b>Rantai:</b> entry path &rarr; signing (request jahat di-approve). Entry path &rarr; key (payload recovery atau private key).</div>
+      <p><span class="label">Invariant:</span> outside requests only run when their origin and content are verified. One entry path must not have looser checks than another path.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Deep link abuse: deep links used to inject a signing request or change state.</li><li>Malicious QR payload: a QR code holds a recovery, private key, or WalletConnect URI that executes directly.</li><li>WebView or JS bridge: bridge exposed to web content, XSS in the WebView can reach wallet functions.</li><li>WalletConnect: session or signing request from a malicious dApp, origin check anchored to an attacker-claimed URL.</li><li>Social login or connect: origin spoof, login used for access it was not meant for.</li></ul>
+      <div class="chain"><b>Chain:</b> entry path &rarr; signing (a malicious request gets approved). Entry path &rarr; key (recovery or private key payload).</div>
     </div>
 
     <div class="card">
       <h4>C5. Platform &amp; supply chain</h4>
       <div class="chips"><span class="chip">platform-supply</span><span class="chip lens">L04</span><span class="chip lens">L06</span></div>
-      <p><span class="label">Aturan yang harus dijaga:</span> website atau dependency tidak boleh jadi jalan ke wallet. Perilaku dependency yang tidak diasumsikan harus dibuktikan dampaknya di project ini, bukan sekadar versi.</p>
-      <p><span class="label">Turunan:</span></p>
-      <ul><li>Website IDOR atau session: akun di website bisa akses data akun lain.</li><li>Dependency dipakai dengan cara yang berbahaya: RNG atau KDF di binary yang tidak bisa diverifikasi, SDK yang dipercaya tanpa cek.</li><li>Perilaku SDK yang tidak tertulis berubah dan cek terlewat.</li></ul>
-      <div class="chain"><b>Rantai:</b> platform &rarr; key / signing kalau website atau SDK bisa memicu aksi wallet. Kelas ini paling rendah prioritasnya, dicopot dulu kalau run sudah 3 kelas.</div>
+      <p><span class="label">Invariant:</span> a website or dependency must not become a path into the wallet. Unassumed dependency behavior must be proven to matter for this project, not just by version.</p>
+      <p><span class="label">Derivatives:</span></p>
+      <ul><li>Website IDOR or session: an account on the website can access another account's data.</li><li>Dependency used dangerously: RNG or KDF in an unverifiable binary, an SDK trusted without a check.</li><li>Undocumented SDK behavior changes and a check is skipped.</li></ul>
+      <div class="chain"><b>Chain:</b> platform &rarr; key / signing if the website or SDK can trigger a wallet action. This class has the lowest priority, drop it first when a run already has 3 classes.</div>
     </div>
   </div>
 </section>
 
 <section>
-  <h2><span class="num">6.</span> Teknik &rarr; Lensa</h2>
-  <p class="lead">Ini tabel yang diminta: tiap teknik bug dicari pakai lensa apa. Teknik itu <i>cara</i> pelanggarannya. Kelas di atas itu <i>apa</i> yang dilanggar. Satu teknik bisa masuk ke beberapa kelas.</p>
+  <h2><span class="num">6.</span> Technique -&gt; Lens</h2>
+  <p class="lead">This is the table as requested: which lens hunts each bug technique. A technique is the <i>how</i> of the violation. A class is the <i>what</i> that gets violated. One technique can sit in several classes.</p>
   <table>
-    <tr><th>Teknik</th><th>Lensa</th><th>Kenapa lensa itu</th></tr>
-    <tr><td><b>IDOR / BOLA</b><br>Tenant isolation</td><td>L01, L02, L03, L06, L07, L11</td><td>Tidak ada cek kepemilikan, cek cuma di satu jalur, ID dipercaya begitu saja, objek sama izin beda, owner bisa dipindah, akses lama masih hidup.</td></tr>
-    <tr><td><b>SSRF</b></td><td>L01, L03, L05, L06, L07, L09</td><td>Fetch URL tanpa allowlist, URL dipercaya tanpa cek, digabung dengan fitur lain jadi jalan ke internal, jalur lain lebih longgar, identitas internal dipakai, urutan cek bisa dilewati.</td></tr>
-    <tr><td><b>ATO / Auth bypass</b></td><td>L01, L02, L03, L07, L11</td><td>Tidak ada cek, cek cuma di satu endpoint, token dipercaya tanpa cek, akun bisa di-link ke attacker, sesi lama masih hidup.</td></tr>
-    <tr><td><b>XSS</b></td><td>L01, L03, L05, L06, L09</td><td>Input tidak dicek, data dipercaya tanpa encode, digabung dengan fitur lain, tampil beda di tiap tempat, urutan render bisa dilewati.</td></tr>
-    <tr><td><b>SQLi</b></td><td>L01, L03, L04, L09</td><td>Input tidak dicek, query dipercaya begitu saja, perilaku database yang tidak tertulis, urutan validasi bisa dilewati.</td></tr>
-    <tr><td><b>RCE</b></td><td>L01, L03, L04, L05, L06</td><td>Tidak ada cek di sink eksekusi, input dipercaya, perilaku parser tidak tertulis, digabung dengan upload atau template, jalur lain lebih longgar.</td></tr>
-    <tr><td><b>Business Logic</b></td><td>L03, L05, L09, L10, L13</td><td>Angka dipercaya, gabungan langkah jadi bypass, urutan langkah dilewati, efek samping tetap jalan, dua state bertentangan.</td></tr>
-    <tr><td><b>Race Condition</b></td><td>L05, L09, L10, L13</td><td>Dua request bersamaan, urutan cek dan pakai bisa dibalik, efek samping tidak ikut batal, state ganda bertentangan.</td></tr>
-    <tr><td><b>File Upload / Traversal</b></td><td>L01, L06, L08, L12</td><td>Tipe file tidak dicek, jalur download beda izinnya, file gagal tetap tersimpan, file bisa dibatalkan atau diganti pihak lain.</td></tr>
-    <tr><td><b>Host Header / Reset Poisoning</b></td><td>L02, L03, L07</td><td>Host dicek di satu tempat saja, host dari request dipercaya, link reset bisa dipindah ke akun attacker.</td></tr>
-    <tr><td><b>Prototype Pollution</b></td><td>L03, L04, L05</td><td>Objek merge dipercaya tanpa cek, perilaku merge tidak tertulis, digabung dengan gadget jadi RCE atau XSS.</td></tr>
-    <tr><td><b>Request Smuggling</b></td><td>L02, L04, L09, L13</td><td>Front-end dan back-end beda cara baca request, perilaku parser tidak tertulis, urutan request bisa dibalik, dua cara baca bertentangan.</td></tr>
-    <tr><td><b>Subdomain Takeover</b></td><td>L02, L03, L06, L07</td><td>Cek cuma di satu tempat, CNAME dipercaya tanpa cek, subdomain bisa dipakai lewat jalur lain, cookie atau OAuth bisa dipindah.</td></tr>
-    <tr><td><b>Blind Signing</b></td><td>L02, L03, L05, L08, L09</td><td>Yang tampil beda dari yang di-sign, data dipercaya tanpa cek, digabung dengan request jahat, prompt tetap muncul walau gagal, urutan review bisa dilewati.</td></tr>
-    <tr><td><b>Oracle / Replay</b></td><td>L03, L04, L07, L09, L10, L13</td><td>Harga atau signature dipercaya tanpa cek, perilaku oracle tidak tertulis, identitas bisa dipindah, urutan bisa dibalik, efek tidak ikut batal, dua state bertentangan.</td></tr>
+    <tr><th>Technique</th><th>Lens</th><th>Why that lens</th></tr>
+    <tr><td><b>IDOR / BOLA</b><br>Tenant isolation</td><td>L01, L02, L03, L06, L07, L11</td><td>No ownership check, check only on one path, ID trusted as-is, same object with different permissions, owner can be moved, old access still works.</td></tr>
+    <tr><td><b>SSRF</b></td><td>L01, L03, L05, L06, L07, L09</td><td>URL fetched with no allowlist, URL trusted without a check, combined with another feature it reaches internal systems, another path is looser, internal identity is used, check order can be skipped.</td></tr>
+    <tr><td><b>ATO / Auth bypass</b></td><td>L01, L02, L03, L07, L11</td><td>No check, check only on one endpoint, token trusted without a check, account can be linked to an attacker, old session still works.</td></tr>
+    <tr><td><b>XSS</b></td><td>L01, L03, L05, L06, L09</td><td>Input not checked, data trusted without encoding, combined with another feature, renders differently in each place, render order can be skipped.</td></tr>
+    <tr><td><b>SQLi</b></td><td>L01, L03, L04, L09</td><td>Input not checked, query trusted as-is, undocumented database behavior, validation order can be skipped.</td></tr>
+    <tr><td><b>RCE</b></td><td>L01, L03, L04, L05, L06</td><td>No check at the execution sink, input trusted, undocumented parser behavior, combined with upload or template, another path is looser.</td></tr>
+    <tr><td><b>Business Logic</b></td><td>L03, L05, L09, L10, L13</td><td>Numbers trusted, combined steps become a bypass, step order skipped, side effects still run, two states contradict each other.</td></tr>
+    <tr><td><b>Race Condition</b></td><td>L05, L09, L10, L13</td><td>Two requests at once, check-and-use order can flip, side effects do not roll back, dual state contradicts itself.</td></tr>
+    <tr><td><b>File Upload / Traversal</b></td><td>L01, L06, L08, L12</td><td>File type not checked, download path has different permissions, failed file still stored, file can be cancelled or replaced by another party.</td></tr>
+    <tr><td><b>Host Header / Reset Poisoning</b></td><td>L02, L03, L07</td><td>Host checked in one place only, host from the request trusted, reset link can be moved to an attacker account.</td></tr>
+    <tr><td><b>Prototype Pollution</b></td><td>L03, L04, L05</td><td>Merged objects trusted without a check, undocumented merge behavior, combined with a gadget it becomes RCE or XSS.</td></tr>
+    <tr><td><b>Request Smuggling</b></td><td>L02, L04, L09, L13</td><td>Front end and back end read the request differently, undocumented parser behavior, request order can be flipped, two readings contradict each other.</td></tr>
+    <tr><td><b>Subdomain Takeover</b></td><td>L02, L03, L06, L07</td><td>Check only in one place, CNAME trusted without a check, subdomain usable through another path, cookie or OAuth can be moved.</td></tr>
+    <tr><td><b>Blind Signing</b></td><td>L02, L03, L05, L08, L09</td><td>What is shown differs from what is signed, data trusted without a check, combined with a malicious request, prompt still appears after failure, review order can be skipped.</td></tr>
+    <tr><td><b>Oracle / Replay</b></td><td>L03, L04, L07, L09, L10, L13</td><td>Price or signature trusted without a check, undocumented oracle behavior, identity can be moved, order can be flipped, effects do not roll back, two states contradict each other.</td></tr>
   </table>
 </section>
 
 <section>
-  <h2><span class="num">7.</span> Chaining: satu temuan kecil jangan dibuang</h2>
-  <p class="lead">Cek rantai dulu sebelum tutup temuan. Severity ikut impact akhir rantai, bukan link pertama.</p>
+  <h2><span class="num">7.</span> Chaining: do not throw away a small finding</h2>
+  <p class="lead">Check the chain first before closing a finding. Severity follows the final impact of the chain, not the first link.</p>
   <div class="chain-flow"><span class="flow">API / IDOR</span><span class="arrow">&rarr;</span><span class="flow">Auth / ATO</span><span class="arrow">&rarr;</span><span class="flow">RCE</span></div>
   <div class="chain-flow"><span class="flow">SSRF</span><span class="arrow">&rarr;</span><span class="flow">RCE</span><span class="arrow">&rarr;</span><span class="flow">Auth / cloud</span></div>
   <div class="chain-flow"><span class="flow">XSS</span><span class="arrow">&rarr;</span><span class="flow">Auth / ATO</span><span class="arrow">&rarr;</span><span class="flow">API</span></div>
@@ -322,15 +322,15 @@ pre { background: #1a1a2e; color: #e6edff; padding: 18px; border-radius: 14px; o
   <div class="chain-flow"><span class="flow">Oracle</span><span class="arrow">&rarr;</span><span class="flow">Settlement accounting</span></div>
   <div class="chain-flow"><span class="flow">Attestation replay</span><span class="arrow">&rarr;</span><span class="flow">Settlement accounting</span></div>
   <div class="chain-flow"><span class="flow">Entry paths</span><span class="arrow">&rarr;</span><span class="flow">Signing</span><span class="arrow">&rarr;</span><span class="flow">Key &amp; seed</span></div>
-  <div class="chain-flow"><span class="flow">Backup bocor</span><span class="arrow">&rarr;</span><span class="flow">Key &amp; seed</span></div>
-  <div class="note" style="margin-top:18px"><b>Aturan rantai:</b> kalau satu link terbukti, jangan tutup di kelas pertama. Lanjut ke kelas berikutnya di rantai itu sebelum nulis laporan.</div>
+  <div class="chain-flow"><span class="flow">Leaked backup</span><span class="arrow">&rarr;</span><span class="flow">Key &amp; seed</span></div>
+  <div class="note" style="margin-top:18px"><b>Chain rule:</b> if one link is proven, do not close it at the first class. Move to the next class in that chain before writing the report.</div>
 </section>
 
 <section>
-  <h2><span class="num">8.</span> Terapin ke mutator</h2>
+  <h2><span class="num">8.</span> Apply it to the mutator</h2>
   <pre>python3 mutator.py mutate --no-api --threat-model threat-models/&lt;target&gt;.md --target &lt;Target&gt;
-python3 mutator.py mutate --no-api --threat-model threat-models/&lt;target&gt;.md --target &lt;Target&gt; --classes &lt;id-kelas-1&gt;,&lt;id-kelas-2&gt;</pre>
-  <p class="lead">Cek kelas dan lensa yang kepilih di output <code>[classes] ...</code> dan di <code>run.json</code> field <code>priority_classes</code> dan <code>lenses</code> per round.</p>
+python3 mutator.py mutate --no-api --threat-model threat-models/&lt;target&gt;.md --target &lt;Target&gt; --classes &lt;class-id-1&gt;,&lt;class-id-2&gt;</pre>
+  <p class="lead">Check the classes and lenses picked in the <code>[classes] ...</code> output and in <code>run.json</code> fields <code>priority_classes</code> and <code>lenses</code> per round.</p>
 </section>
 
 </div>

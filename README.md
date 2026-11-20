@@ -1,149 +1,160 @@
 # prompt-mutator
 
-Mutator prompt buat riset vuln, sesuai pendekatan di tweet yang lu share:
-model murah dipakai buat breadth (cari sinyal dari banyak sudut), model
-frontier cuma buat konfirmasi/triage nanti. Tool ini cuma mutasi PROMPT,
-bukan ngetes target dan bukan jalanin exploit.
+A prompt mutator for vulnerability research. Cheap models do the breadth
+work: they search from many angles for signals. Frontier models come
+later, for confirmation and triage only. This tool only mutates prompts.
+It does not test targets and does not run exploits.
 
-Alurnya:
+How it works:
 
 ```
-13 lensa dasar  +  threat model target
+13 base lenses  +  target threat model
         |
-   mutator (LLM murah / template)
+   mutator (cheap LLM / template)
         |
-   varian prompt (dedup, ber-ID, per round)
+   prompt variants (deduped, numbered, per round)
         |
-   swarm -> 1 file tugas per agent (buat Hermes)
+   swarm -> 1 task file per agent
         |
-   agent nulis sinyal ke signals/
+   agents write signals to signals/
         |
-   ingest -> varian follow-up round berikutnya
-        |  (loop sampai path habis atau sinyal berhenti)
+   ingest -> follow-up variants for the next round
+        |  (loops until paths run out or signals stop)
 ```
 
-## File
+## Files
 
-- `mutator.py` — CLI utama, Python stdlib saja, tanpa pip install
-- `lenses.json` — 13 lensa dari tweet (L01-L13)
-- `priority-classes.json` — kandidat kelas per tipe project
-  (web2 / web3-contract / wallet) + pemetaan tiap kelas ke lensa;
-  single source of truth buat Angle prioritas dinamis
-- `CHEAT-MAP-KELAS.md` — cheat map kelas bug per lane + turunannya
-  (sub-bug, invariant, lensa, chain) buat nentuin Angle prioritas;
-  baca ini dulu sebelum isi kelas di threat model
-- `cheat-map-kelas.html` — versi presentasi dari cheat map yang sama,
-  buat orang awam: lensa 1-13, 17 kelas per lane + lensa di tiap kartu,
-  tabel teknik -> lensa, dan chaining. Buka di browser, tidak perlu server
-- `threat-models/TEMPLATE.md` — template threat model per target
-- `mutator.ps1` — wrapper buat Windows PowerShell
-- `runs/` — hasil tiap run (dibuat otomatis)
+- `mutator.py` - main CLI, Python standard library only, no pip install
+- `lenses.json` - 13 lenses (L01-L13)
+- `priority-classes.json` - candidate classes per project type
+  (web2 / web3-contract / wallet), mapped to lenses;
+  the single source of truth for dynamic priority angles
+- `CHEAT-MAP-KELAS.md` - bug-class cheat map per lane, with derivatives
+  (sub-bugs, invariants, lenses, chains) for picking a priority angle;
+  read it before filling in classes in the threat model
+- `cheat-map-kelas.html` - the same cheat map as a presentation,
+  for a general audience: lenses 1-13, 17 classes per lane with lenses
+  on each card, a technique-to-lens table, and chaining. Open it in a
+  browser, no server needed
+- `threat-models/TEMPLATE.md` - threat model template, one per target
+- `mutator.ps1` - wrapper for Windows PowerShell
+- `runs/` - run output (created automatically)
 
 ## Setup
 
-Python 3.11+ saja. Key API lewat environment variable, tidak pernah
-disimpan di file:
+Python 3.11+ only. API keys come from environment variables, never
+from files. Full setup for each environment is in
+[docs/USAGE.md](docs/USAGE.md).
 
 ```powershell
-# Windows PowerShell (PC Hermes)
-$env:STEPFUN_API_KEY = "isi-key-lu"
-.\mutator.ps1 mutate --threat-model .\threat-models\TEMPLATE.md --target <NamaTarget> --variants-per-lens 3
+# Windows PowerShell
+$env:OPENAI_API_KEY = "<your-api-key>"
+.\mutator.ps1 mutate --threat-model .\threat-models\TEMPLATE.md --target <TargetName> --variants-per-lens 3
 ```
 
 ```bash
-# Linux / VM ini
-export STEPFUN_API_KEY="isi-key-lu"
-python3 mutator.py mutate --threat-model threat-models/TEMPLATE.md --target <NamaTarget> --variants-per-lens 3
+# Linux / macOS
+export OPENAI_API_KEY="<your-api-key>"
+python3 mutator.py mutate --threat-model threat-models/TEMPLATE.md --target <TargetName> --variants-per-lens 3
 ```
 
-Provider lain:
+Other provider:
 
 ```bash
-export DEEPSEEK_API_KEY="isi-key-lu"
-python3 mutator.py mutate --provider deepseek --threat-model threat-models/TEMPLATE.md --target <NamaTarget>
+export DEEPSEEK_API_KEY="<your-api-key>"
+python3 mutator.py mutate --provider deepseek --threat-model threat-models/TEMPLATE.md --target <TargetName>
 ```
 
-Tanpa key sama sekali (mode template, deterministik, gratis):
+No key at all (template mode, deterministic, free):
 
 ```bash
-python3 mutator.py mutate --no-api --threat-model threat-models/TEMPLATE.md --target <NamaTarget>
+python3 mutator.py mutate --no-api --threat-model threat-models/TEMPLATE.md --target <TargetName>
 ```
 
-## Pakai
+## Usage
 
 ```bash
-# 1. Mutasi round 1 (default: 3 varian per lensa = 39 varian)
-python3 mutator.py mutate --threat-model threat-models/TEMPLATE.md --target <NamaTarget>
+# 1. Mutate round 1 (default: 3 variants per lens = 39 variants)
+python3 mutator.py mutate --threat-model threat-models/TEMPLATE.md --target <TargetName>
 
-# cuma lensa tertentu
-python3 mutator.py mutate --threat-model threat-models/TEMPLATE.md --target <NamaTarget> --lenses L01,L06,L07
+# only certain lenses
+python3 mutator.py mutate --threat-model threat-models/TEMPLATE.md --target <TargetName> --lenses L01,L06,L07
 
-# 2. Bagi jadi file tugas per agent (1 prompt per agent, 8 agent)
-python3 mutator.py swarm --run runs/<target>-<tanggal> --agents 8
+# 2. Split into one task file per agent (1 prompt per agent, 8 agents)
+python3 mutator.py swarm --run runs/<target>-<date> --agents 8
 
-# 3. Kasih 1 file agent ke tiap Hermes, agent nulis hasil ke signals/agent-XX.md
-#    format sinyal: baris "Lead: ..." buat hal yang belum terkonfirmasi
-#    tapi layak dikejar, atau section "## Finding" buat temuan.
+# 3. Hand one agent file to each agent; agents write results to signals/agent-XX.md
+#    signal format: a "Lead: ..." line for something unconfirmed
+#    but worth chasing, or a "## Finding" section for a finding.
 
-# 4. Sinyal balik jadi varian follow-up round 2
-python3 mutator.py ingest --run runs/<target>-<tanggal> --signals runs/<target>-<tanggal>/signals
+# 4. Signals feed back into round 2 follow-up variants
+python3 mutator.py ingest --run runs/<target>-<date> --signals runs/<target>-<date>/signals
 
-# 5. Ulangi swarm + ingest sampai path habis
-python3 mutator.py swarm --run runs/<target>-<tanggal> --agents 8
-python3 mutator.py status --run runs/<target>-<tanggal>
+# 5. Repeat swarm + ingest until paths run out
+python3 mutator.py swarm --run runs/<target>-<date> --agents 8
+python3 mutator.py status --run runs/<target>-<date>
 ```
 
-## Aturan main
+## Rules
 
-- **Role red team di semua prompt.** Setiap varian yang dihasilkan
-  mutator diawali role ini: "You are a senior red team operator and
-  professional cyber security researcher conducting authorized bug
-  bounty research on an in-scope target. Think like an attacker,
-  verify like an auditor: every claim needs executed proof." Berlaku
-  di mode template, mode LLM, dan follow-up `ingest`. Kalau LLM
-  mengembalikan varian tanpa role, mutator menambahkannya sendiri
-  sebelum disimpan.
-- **Kelas prioritas dinamis, max 3 per run.** Tiap threat model wajib isi
-  `## Angle prioritas` sebelum mutate: pilih max 3 kelas dari daftar
-  kandidat tipe project itu di `priority-classes.json`, lalu urut ulang
-  berdasarkan project ini (reward, scope, bukti yang sudah ada). Top 3
-  web3 tidak sama dengan top 3 web2, dan top 3 satu web2 tidak sama
-  dengan web2 lain. Mutator baca heading `### Kelas N — <nama>` di
-  threat model dan auto-pilih lensa yang dipetakan ke kelas itu
-  (field `lenses` per kelas di `priority-classes.json`); kalau threat
-  model menulis lebih dari 3 kelas, yang dipakai cuma 3 teratas.
-  Precedence: `--lenses` > `--classes` (id kelas, mis.
-  `--classes key-seed,signing`) > Angle prioritas di threat model >
-  semua 13 lensa kalau tidak ada kelas. Kelas ke-4+ bukan dihapus,
-  cuma dicopot dari run ini dan masuk round berikutnya kalau signals
-  top 3 kering.
-- **Prompt menyesuaikan proyek.** Tiap threat model wajib isi
-  `Project type:` (`web2`, `web3-contract`, atau `wallet`) dan section
-  `## Use cases`. Mutator pakai itu buat milih kata-kata lensa
-  (lihat field `adapt` di `lenses.json`) dan posisi awal attacker,
-  dan tiap varian nyebutin use case yang ditarget. Proyek dinamis =
-  threat model-nya yang diubah, prompt ikut berubah, tanpa utak-atik
-  kode. Tipe baru: tambah entri `adapt` per lensa di `lenses.json`
-  plus daftar starting position di `mutator.py` (dict `STARTS`).
-- **Scope dari threat model.** Semua varian yang di-generate nyebutin
-  out-of-scope dari file threat model. Kalau file-nya kosong atau salah,
-  hasil mutasi ikut salah, jadi isi threat model dulu dengan benar.
-- **Dedup.** Varian yang sama (teks mirip) cuma masuk sekali, lintas round.
-- **Budget API.** Default maks 40 call per perintah (`--max-api-calls`).
-  Setiap call dicatat token in/out di `run.json`.
-- **Verdict tetap lewat gate.** File tugas agent sudah berisi aturan gate:
-  CONFIRMED / FALSIFIED / INCONCLUSIVE, mekanisme terbukti bukan berarti
-  vuln valid, bukti wajib ada. Sinyal dari mutator tetap sinyal, bukan
-  temuan, sampai ada proof yang dieksekusi.
-- **Key tidak pernah di-print atau disimpan.** Kalau API error 401/403,
-  cek env var key-nya dulu.
+- **Red-team role in every prompt.** Every variant the mutator
+  generates starts with this role: "You are a senior red team
+  researcher conducting authorized bug bounty research on an in-scope
+  target. Think like an attacker, verify like an auditor: every claim
+  needs executed proof." It applies in template mode, LLM mode, and
+  `ingest` follow-ups. If the LLM returns a variant without the role,
+  the mutator adds it before saving.
+- **Dynamic priority classes, max 3 per run.** Every threat model must
+  fill in `## Priority angle` before mutate: pick max 3 classes from
+  the candidate list for that project type in
+  `priority-classes.json`, then reorder for this project (reward,
+  scope opened up, existing evidence). The top 3 for web3 are not the
+  same as the top 3 for web2, and the top 3 for one web2 project are
+  not the same as for another. The mutator reads `### Class N -
+  <name>` headings in the threat model and auto-selects the lenses
+  mapped to each class (the `lenses` field per class in
+  `priority-classes.json`); if a threat model lists more than 3
+  classes, only the top 3 are used. Precedence: `--lenses` >
+  `--classes` (class ids, e.g. `--classes key-seed,signing`) >
+  priority angle in the threat model > all 13 lenses when no classes
+  are given. Class 4 and beyond are not deleted, just dropped from
+  this run, and they go into the next round if signals from the top 3
+  run dry.
+- **Prompts adapt to the project.** Every threat model must fill in
+  `Project type:` (`web2`, `web3-contract`, or `wallet`) and a
+  `## Use cases` section. The mutator uses them to pick lens wording
+  (see the `adapt` field in `lenses.json`) and attacker starting
+  positions, and every variant names the use case it targets. A
+  project is dynamic: change the threat model and the prompts change
+  with it, without touching code. New type: add an `adapt` entry per
+  lens in `lenses.json` plus a starting-position list in `mutator.py`
+  (the `STARTS` dict).
+- **Scope comes from the threat model.** Every generated variant names
+  the out-of-scope items from the threat model file. If that file is
+  empty or wrong, the mutation is wrong too, so fill in the threat
+  model correctly first.
+- **Dedup.** A variant with similar text only enters once, across
+  rounds.
+- **API budget.** Default max 40 calls per command
+  (`--max-api-calls`). Every call logs tokens in/out in `run.json`.
+- **Verdicts still go through the gate.** Agent task files already
+  contain the gate rules: CONFIRMED / FALSIFIED / INCONCLUSIVE. A
+  proven mechanism is not a valid vulnerability without executed
+  proof. A signal from the mutator stays a signal, not a finding,
+  until there is executed proof.
+- **Keys are never printed or stored.** On API error 401/403, check
+  the key env var first.
 
-## Yang tidak dilakukan tool ini
+## What this tool does not do
 
-- Tidak menyentuh target, tidak kirim request, tidak jalanin exploit.
-- Tidak milih target buat lu dan tidak submit apa pun.
-- Tidak gantiin threat model: mutator cuma sebagus file threat model yang
-  lu kasih.
+- It does not touch targets, send requests, or run exploits.
+- It does not pick targets for you and does not submit anything.
+- It does not replace the threat model: the mutator is only as good
+  as the threat model you give it.
+
+## License
+
+Dual-licensed under MIT OR Apache-2.0. See LICENSE-MIT and LICENSE-APACHE.
 
 ## Lisensi
 
