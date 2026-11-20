@@ -92,7 +92,7 @@ key and never stores one in a file. Two providers are built in.
 | Provider | Default | Env vars |
 | --- | --- | --- |
 | OpenAI-compatible (default) | `gpt-4o-mini` at `https://api.openai.com/v1` | `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL` |
-| DeepSeek (alternative) | `deepseek-flash` at `https://api.deepseek.com/v1` | `DEEPSEEK_API_KEY`, `DEEPSEEK_MODEL`, `DEEPSEEK_BASE_URL` |
+| DeepSeek (alternative) | `deepseek-chat` at `https://api.deepseek.com/v1` | `DEEPSEEK_API_KEY`, `DEEPSEEK_MODEL`, `DEEPSEEK_BASE_URL` |
 
 Set the key for the provider you use:
 
