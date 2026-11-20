@@ -1,0 +1,377 @@
+{
+  "max_classes_per_run": 3,
+  "note": "Kandidat kelas per tipe project, BUKAN top 3 yang fixed. Urutan di sini cuma saran default berdasarkan impact tipikal. Threat model tiap engagement yang menentukan top 3 sebenarnya: pilih max 3 dari daftar tipe itu, urut ulang berdasarkan reward, scope, dan bukti yang sudah ada di project tersebut. Jangan copy top 3 dari tipe lain. Kalau nama kelas di threat model tidak cocok persis, mutator mencocokkan lewat field 'match' (kata kunci).",
+  "types": {
+    "wallet": {
+      "candidates": [
+        {
+          "id": "key-seed",
+          "impact": "Total loss semua dana, semua chain: key bocor atau diakses tanpa auth.",
+          "lenses": [
+            "L01",
+            "L03",
+            "L06",
+            "L11",
+            "L13"
+          ],
+          "match": [
+            "key",
+            "seed",
+            "kunci",
+            "mnemonic",
+            "recovery phrase",
+            "keychain",
+            "secure enclave",
+            "vault",
+            "pin"
+          ],
+          "name": "Key & seed"
+        },
+        {
+          "id": "signing",
+          "impact": "Dana hilang satu tap: yang tampil beda dari yang di-sign, replay lintas chain.",
+          "lenses": [
+            "L02",
+            "L03",
+            "L05",
+            "L08",
+            "L09"
+          ],
+          "match": [
+            "signing",
+            "sign",
+            "blind signing",
+            "transaction display",
+            "permit",
+            "eip-712",
+            "typed data",
+            "approve"
+          ],
+          "name": "Signing & transaction display"
+        },
+        {
+          "id": "auth-recovery",
+          "impact": "Backup / export tanpa re-auth, recovery phrase bocor, auth di-bypass.",
+          "lenses": [
+            "L01",
+            "L03",
+            "L06",
+            "L11"
+          ],
+          "match": [
+            "auth",
+            "recovery",
+            "backup",
+            "biometric",
+            "biometrik",
+            "passcode",
+            "export",
+            "import",
+            "cloud backup"
+          ],
+          "name": "Auth, recovery & backup"
+        },
+        {
+          "id": "entry-paths",
+          "impact": "Pintu ke key & signing: dApp / link / QR jahat injeksi request.",
+          "lenses": [
+            "L02",
+            "L03",
+            "L05",
+            "L06"
+          ],
+          "match": [
+            "deep link",
+            "qr",
+            "webview",
+            "walletconnect",
+            "dapp",
+            "entry",
+            "jalur masuk",
+            "url scheme"
+          ],
+          "name": "Entry paths: deep link / QR / WebView / WalletConnect"
+        },
+        {
+          "id": "platform-supply",
+          "impact": "Website / dependency dipakai buat akses wallet, dampak kondisional.",
+          "lenses": [
+            "L04",
+            "L06"
+          ],
+          "match": [
+            "platform",
+            "supply",
+            "dependency",
+            "website",
+            "sdk",
+            "binary"
+          ],
+          "name": "Platform & supply chain"
+        }
+      ]
+    },
+    "web2": {
+      "candidates": [
+        {
+          "id": "tenant-isolation",
+          "impact": "Akses data / aksi akun lain: project, file, payout, budget.",
+          "lenses": [
+            "L01",
+            "L02",
+            "L03",
+            "L06",
+            "L07",
+            "L11"
+          ],
+          "match": [
+            "tenant",
+            "idor",
+            "isolasi",
+            "antar akun",
+            "antar customer",
+            "antar merchant",
+            "cross-tenant",
+            "cross-account"
+          ],
+          "name": "Tenant isolation & IDOR"
+        },
+        {
+          "id": "payment-logic",
+          "impact": "Uang bergerak tanpa bayar, harga / payout dimanipulasi, limit dilewati.",
+          "lenses": [
+            "L03",
+            "L05",
+            "L09",
+            "L10",
+            "L13"
+          ],
+          "match": [
+            "payment",
+            "payout",
+            "pricing",
+            "harga",
+            "billing",
+            "budget",
+            "bayar",
+            "refund",
+            "business logic",
+            "logika bisnis"
+          ],
+          "name": "Business logic: payment / pricing / payout"
+        },
+        {
+          "id": "auth-session",
+          "impact": "Naik peran, sesi orang lain dipakai, akses setelah revoke masih hidup.",
+          "lenses": [
+            "L01",
+            "L02",
+            "L07",
+            "L11"
+          ],
+          "match": [
+            "auth",
+            "session",
+            "login",
+            "privilege",
+            "role",
+            "peran",
+            "escalation",
+            "password reset",
+            "sesi"
+          ],
+          "name": "Auth, session & privilege escalation"
+        },
+        {
+          "id": "file-handling",
+          "impact": "File orang lain di-download, upload jadi eksekusi / traversal.",
+          "lenses": [
+            "L01",
+            "L06",
+            "L08",
+            "L12"
+          ],
+          "match": [
+            "file",
+            "upload",
+            "download",
+            "dokumen",
+            "deliverable",
+            "asset"
+          ],
+          "name": "File upload / download & access"
+        },
+        {
+          "id": "workflow-state",
+          "impact": "Langkah approval / verifikasi dilewati, state dibalik tanpa otorisasi.",
+          "lenses": [
+            "L05",
+            "L09",
+            "L10",
+            "L12",
+            "L13"
+          ],
+          "match": [
+            "workflow",
+            "state",
+            "approval",
+            "persetujuan",
+            "lifecycle",
+            "alur",
+            "tahap"
+          ],
+          "name": "Workflow / state-machine bypass"
+        },
+        {
+          "id": "integration",
+          "impact": "Event / token integrasi dipakai buat akses atau aksi lintas akun.",
+          "lenses": [
+            "L02",
+            "L03",
+            "L04",
+            "L06"
+          ],
+          "match": [
+            "integration",
+            "integrasi",
+            "webhook",
+            "oauth",
+            "slack",
+            "asana",
+            "jira",
+            "third-party",
+            "pihak ketiga"
+          ],
+          "name": "Integration / webhook / OAuth"
+        }
+      ]
+    },
+    "web3-contract": {
+      "candidates": [
+        {
+          "id": "settlement-accounting",
+          "impact": "Mint tanpa backing, double-settle, dana keluar lebih besar dari deposit.",
+          "lenses": [
+            "L01",
+            "L03",
+            "L05",
+            "L10",
+            "L13"
+          ],
+          "match": [
+            "mint",
+            "burn",
+            "settlement",
+            "accounting",
+            "conservation",
+            "escrow",
+            "depository",
+            "hub",
+            "dana",
+            "balance"
+          ],
+          "name": "Settlement accounting: mint / burn / fund conservation"
+        },
+        {
+          "id": "oracle-pricing",
+          "impact": "Harga basi / palsu dipakai buat settle, fee atau limit dimanipulasi.",
+          "lenses": [
+            "L03",
+            "L04",
+            "L09",
+            "L13"
+          ],
+          "match": [
+            "oracle",
+            "price",
+            "harga",
+            "pricing",
+            "fee",
+            "rate limiter",
+            "stale"
+          ],
+          "name": "Oracle / price / fee manipulation"
+        },
+        {
+          "id": "attestation-replay",
+          "impact": "Satu deposit settle berkali-kali, signature dipakai ulang lintas order / chain.",
+          "lenses": [
+            "L03",
+            "L07",
+            "L09",
+            "L10"
+          ],
+          "match": [
+            "attestation",
+            "replay",
+            "idempotency",
+            "nonce",
+            "signature",
+            "oracle signature",
+            "proof"
+          ],
+          "name": "Attestation / signature replay & idempotency"
+        },
+        {
+          "id": "executor-claim",
+          "impact": "Solver lain klaim fill orang, eksekusi order tanpa jadi resolver yang dipilih.",
+          "lenses": [
+            "L01",
+            "L02",
+            "L06",
+            "L07"
+          ],
+          "match": [
+            "executor",
+            "solver",
+            "claim",
+            "resolver",
+            "fill",
+            "withdrawal",
+            "allocator"
+          ],
+          "name": "Executor / solver claiming & access"
+        },
+        {
+          "id": "admin-roles",
+          "impact": "Role admin direbut atau dipakai buat ubah destinasi / parameter kritis.",
+          "lenses": [
+            "L01",
+            "L07",
+            "L11",
+            "L12"
+          ],
+          "match": [
+            "admin",
+            "role",
+            "owner",
+            "multisig",
+            "upgrade",
+            "config",
+            "council"
+          ],
+          "name": "Admin / roles & upgrade"
+        },
+        {
+          "id": "token-behaviour",
+          "impact": "Perilaku token yang tidak diasumsikan bikin accounting atau eksekusi salah.",
+          "lenses": [
+            "L04",
+            "L05",
+            "L08"
+          ],
+          "match": [
+            "token",
+            "fee-on-transfer",
+            "rebasing",
+            "hook",
+            "external call",
+            "calldata"
+          ],
+          "name": "Token behaviour & external calls"
+        }
+      ]
+    }
+  },
+  "version": 1
+}
